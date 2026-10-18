@@ -1,0 +1,964 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Sreshta Talks — Face the Camera</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Nunito:wght@600;700;800;900&display=swap" rel="stylesheet">
+<style>
+:root{
+  --pink:#FFD9E4; --pink2:#FFC2D4; --coral:#FF5A5F; --coral-d:#D63A4A;
+  --cream:#FFF7EA; --card:#FFFDF8; --ink:#5B2333; --ink2:#8A5A6B;
+  --gold:#FFB020; --teal:#2BB3A3; --green:#37B34D; --line:#F3C6D3;
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+html,body{max-width:100%;overflow-x:hidden;}
+body{font-family:'Nunito',sans-serif;color:var(--ink);min-height:100vh;
+  background:linear-gradient(180deg,#FFE3EE 0%,#FFD9E4 40%,#FFEAD9 100%);
+  background-attachment:fixed;}
+h1,h2,h3,.baloo{font-family:'Baloo 2',cursive;}
+.screen{display:none;max-width:520px;margin:0 auto;padding:14px 14px 40px;}
+.screen.on{display:block;}
+.card{background:var(--card);border:2px solid var(--line);border-radius:20px;padding:14px;margin:10px 0;
+  box-shadow:0 3px 0 rgba(214,58,74,.12);}
+.btn{display:inline-block;border:none;cursor:pointer;font-family:'Baloo 2',cursive;font-weight:700;
+  border-radius:999px;padding:11px 20px;font-size:17px;background:var(--coral);color:#fff;
+  box-shadow:0 3px 0 var(--coral-d);transition:transform .08s;}
+.btn:active{transform:translateY(2px);box-shadow:0 1px 0 var(--coral-d);}
+.btn:disabled{opacity:.45;box-shadow:none;cursor:default;}
+.btn.soft{background:#fff;color:var(--coral-d);border:2px solid var(--pink2);box-shadow:0 3px 0 var(--pink2);}
+.btn.teal{background:var(--teal);box-shadow:0 3px 0 #1E8578;color:#fff;}
+.btn.gold{background:var(--gold);box-shadow:0 3px 0 #D18F00;color:#5B3A00;}
+.btn.small{padding:7px 14px;font-size:14px;}
+.btn.big{width:100%;font-size:19px;padding:13px;}
+.mut{color:var(--ink2);font-size:13.5px;font-weight:700;}
+.center{text-align:center;}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center;}
+.grow{flex:1;}
+/* ============ RING LIGHT / VIEWFINDER THEME ============ */
+.ringwrap{position:relative;width:118px;height:118px;margin:0 auto;}
+.ringwrap:before{content:"";position:absolute;inset:0;border-radius:50%;
+  border:9px solid #fff;box-shadow:0 0 0 3px var(--pink2),0 0 26px 8px rgba(255,120,150,.55),inset 0 0 14px rgba(255,120,150,.35);}
+.ringwrap .inner{position:absolute;inset:16px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#FFE9F1,#FFC2D4);display:flex;align-items:center;justify-content:center;overflow:hidden;}
+.viewfinder{position:relative;border-radius:18px;background:#3A1522;color:#FFE9F1;padding:16px 21px;overflow:hidden;}
+.viewfinder .vf-corner{position:absolute;width:22px;height:22px;border:3px solid #FFD166;}
+.vf-tl{top:7px;left:7px;border-right:none;border-bottom:none;border-radius:8px 0 0 0;}
+.vf-tr{top:7px;right:7px;border-left:none;border-bottom:none;border-radius:0 8px 0 0;}
+.vf-bl{bottom:7px;left:7px;border-right:none;border-top:none;border-radius:0 0 0 8px;}
+.vf-br{bottom:7px;right:7px;border-left:none;border-top:none;border-radius:0 0 8px 0;}
+.recdot{display:inline-flex;align-items:center;gap:6px;font-family:'Baloo 2',cursive;font-weight:800;letter-spacing:1px;font-size:13px;color:#FFD9D9;}
+.recdot i{width:11px;height:11px;border-radius:50%;background:#FF4040;display:inline-block;animation:blink 1.1s infinite;}
+@keyframes blink{0%,55%{opacity:1}56%,100%{opacity:.15}}
+/* ============ KIKI THE PARROT ============ */
+.kiki-slot{display:inline-block;cursor:pointer;}
+.kiki-svg{width:104px;height:auto;display:block;}
+.kiki-svg.small{width:64px;}
+.kiki-svg.hop{animation:khop .55s ease;}
+.kiki-svg.flap .wingR{animation:kflap .55s ease;transform-origin:104px 96px;}
+.kiki-svg.flap .crest{animation:kflap .55s ease;transform-origin:80px 26px;}
+.kiki-svg.laugh{animation:klaugh .5s ease;}
+.kiki-svg.bow{animation:kbow .6s ease;}
+@keyframes khop{0%{transform:translateY(0)}35%{transform:translateY(-13px)}70%{transform:translateY(0)}85%{transform:translateY(-5px)}100%{transform:translateY(0)}}
+@keyframes kflap{0%,100%{transform:rotate(0)}40%{transform:rotate(-24deg)}}
+@keyframes klaugh{0%,100%{transform:rotate(0)}30%{transform:rotate(-4deg)}60%{transform:rotate(4deg)}}
+@keyframes kbow{0%,100%{transform:rotate(0)}45%{transform:rotate(7deg) translateY(4px)}}
+.bubble{position:relative;background:#fff;border:2px solid var(--pink2);border-radius:16px;padding:10px 12px;font-weight:800;font-size:15px;line-height:1.35;}
+.bubble:before{content:"";position:absolute;left:-9px;top:26px;width:14px;height:14px;background:#fff;border-left:2px solid var(--pink2);border-bottom:2px solid var(--pink2);transform:rotate(45deg);}
+/* ============ ACCESS / PIN ============ */
+.access-hero{text-align:center;padding:18px 6px 4px;}
+.access-hero h1{font-size:29px;color:var(--coral-d);line-height:1.12;}
+.access-hero .sub{font-weight:900;color:var(--ink2);margin-top:4px;font-size:15px;}
+.pad{display:grid;grid-template-columns:repeat(3,74px);gap:10px;justify-content:center;margin:12px 0;}
+.pad button{font-family:'Baloo 2',cursive;font-size:24px;font-weight:800;height:60px;border-radius:16px;
+  border:2px solid var(--pink2);background:#FFF3F6;color:#8A1538;cursor:pointer;box-shadow:0 3px 0 var(--pink2);}
+.pad button:active{transform:translateY(2px);box-shadow:0 1px 0 var(--pink2);}
+.pindots{display:flex;gap:10px;justify-content:center;margin:8px 0 2px;}
+.pindot{width:16px;height:16px;border-radius:50%;border:3px solid var(--coral);background:#fff;}
+.pindot.f{background:var(--coral);}
+.shake{animation:shk .4s;}
+@keyframes shk{0%,100%{transform:translateX(0)}25%{transform:translateX(-7px)}75%{transform:translateX(7px)}}
+/* ============ HOME ============ */
+.topbar{display:flex;align-items:center;gap:10px;margin-top:4px;}
+.studio-lights{display:flex;gap:6px;justify-content:space-between;margin-top:6px;}
+.sl{flex:1;text-align:center;font-size:11px;font-weight:900;color:var(--ink2);}
+.sl i{display:block;width:24px;height:24px;margin:0 auto 2px;border-radius:50%;background:#E9D8CE;border:2px solid #D9BBA9;}
+.sl.lit i{background:radial-gradient(circle at 38% 34%,#FFF3B0,#FFB020);border-color:#D18F00;box-shadow:0 0 10px 2px rgba(255,176,32,.55);}
+.sl.dim i{background:#EFE3DA;}
+.statgrid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;}
+.stat{background:#fff;border:2px solid var(--line);border-radius:16px;padding:8px 4px;text-align:center;}
+.stat b{display:block;font-family:'Baloo 2',cursive;font-size:19px;color:var(--coral-d);line-height:1.1;}
+.stat span{font-size:11.5px;font-weight:900;color:var(--ink2);}
+.todaytalk{background:linear-gradient(160deg,#43182B,#5B2333);border-radius:20px;padding:10px;color:#FFE9F1;}
+.todaytalk .coverart{border-radius:14px;background:linear-gradient(150deg,#FF8FAB,#FF5A5F 55%,#FF9F1C);padding:16px 12px;text-align:center;margin:8px 4px 4px;}
+.todaytalk .coverart .fmt{display:inline-block;background:rgba(255,255,255,.92);color:var(--coral-d);font-family:'Baloo 2',cursive;font-weight:800;font-size:12.5px;border-radius:999px;padding:3px 11px;}
+.todaytalk .coverart h3{color:#fff;font-size:21px;text-shadow:0 2px 6px rgba(90,0,20,.35);margin-top:7px;line-height:1.2;}
+.todaytalk .coverart .sec{color:#FFE9F1;font-weight:800;font-size:13px;margin-top:3px;}
+.stagehead{display:flex;align-items:center;gap:8px;margin:16px 2px 4px;}
+.stagehead h3{font-size:18px;color:var(--coral-d);}
+.stagehead .aud{font-size:11.5px;font-weight:900;color:var(--ink2);}
+.talkgrid{display:grid;grid-template-columns:1fr 1fr;gap:9px;}
+.talkcard{position:relative;background:#fff;border:2px solid var(--line);border-radius:16px;padding:10px;cursor:pointer;min-height:96px;}
+.talkcard.lockd{opacity:.62;cursor:default;background:#FBF1E8;}
+.talkcard.done{border-color:#9AD1A6;background:#F2FBF1;}
+.talkcard .tnum{font-family:'Baloo 2',cursive;font-size:12px;font-weight:800;color:var(--teal);}
+.talkcard h4{font-family:'Baloo 2',cursive;font-size:15.5px;line-height:1.2;margin:2px 0;}
+.talkcard .tfmt{font-size:11px;font-weight:900;color:var(--ink2);}
+.talkcard .badge{position:absolute;top:-8px;right:-4px;background:var(--gold);color:#5B3A00;font-family:'Baloo 2',cursive;font-size:10.5px;font-weight:800;border-radius:999px;padding:2.5px 8px;box-shadow:0 2px 5px rgba(0,0,0,.18);}
+.talkcard .badge.ready{background:var(--coral);color:#fff;}
+.shelf{display:flex;gap:9px;overflow-x:auto;padding:4px 2px 8px;}
+.shelf .mini{flex:0 0 108px;background:#fff;border:2px solid var(--gold);border-radius:14px;padding:8px;text-align:center;font-size:12px;font-weight:900;line-height:1.25;}
+.shelf .mini .st{font-size:19px;}
+.framebox{border:3px solid var(--gold);border-radius:18px;background:#FFF9EC;padding:10px;}
+/* ============ MISSION ============ */
+.steptabs{display:flex;gap:4px;margin:8px 0;}
+.steptabs span{flex:1;height:8px;border-radius:99px;background:#F0CFD9;}
+.steptabs span.done{background:var(--teal);}
+.steptabs span.now{background:var(--coral);}
+.stepname{font-family:'Baloo 2',cursive;font-size:20px;color:var(--coral-d);margin:4px 0 2px;}
+.modelbox{background:#FFF3F6;border:2px dashed var(--pink2);border-radius:16px;padding:12px;font-size:16px;line-height:1.5;font-weight:700;}
+.modelbox .hookline{color:var(--coral-d);font-weight:900;}
+.trickbox{background:#FFF6DE;border:2px solid var(--gold);border-radius:16px;padding:12px;font-size:15.5px;line-height:1.45;font-weight:700;}
+.ptinput{width:100%;border:2px solid var(--line);border-radius:12px;padding:10px;font-family:'Nunito',sans-serif;font-size:15px;font-weight:700;color:var(--ink);margin:4px 0 10px;background:#fff;}
+.ptinput:focus{outline:none;border-color:var(--coral);}
+textarea.ptinput{min-height:56px;resize:vertical;}
+.shootbox{background:#3A1522;border-radius:18px;padding:12px;color:#FFE9F1;}
+.takechip{display:inline-block;background:#fff;color:var(--coral-d);border:2px solid var(--pink2);border-radius:999px;padding:6px 13px;font-family:'Baloo 2',cursive;font-weight:800;font-size:14px;cursor:pointer;margin:3px 2px;}
+.takechip.best{background:var(--gold);border-color:#D18F00;color:#5B3A00;}
+.takechip.live{border-style:dashed;}
+video.talkvid{width:100%;border-radius:12px;background:#000;margin-top:8px;}
+.rate{margin:9px 0;}
+.rate .rname{font-weight:900;font-size:14.5px;margin-bottom:4px;}
+.rate button{border:2px solid var(--line);background:#fff;color:var(--ink);border-radius:999px;padding:6px 13px;font-family:'Baloo 2',cursive;font-weight:700;font-size:13.5px;cursor:pointer;margin-right:5px;}
+.rate button.sel-Growing{background:#FFE1B8;border-color:var(--gold);color:#7A5200;}
+.rate button.sel-Good{background:#CDEEDC;border-color:var(--teal);color:#0E5A50;}
+.rate button.sel-Pro{background:#FFD3DC;border-color:var(--coral);color:var(--coral-d);}
+.packbox{background:#F2FBF1;border:2px solid #9AD1A6;border-radius:16px;padding:12px;}
+.packbox .pline{background:#fff;border:1.5px dashed #9AD1A6;border-radius:10px;padding:7px 10px;font-weight:800;font-size:14px;margin:5px 0;word-break:break-word;}
+/* ============ DASHBOARD ============ */
+.dtabs{display:flex;gap:6px;flex-wrap:wrap;margin:8px 0;}
+.dtabs button{border:2px solid var(--pink2);background:#fff;color:var(--coral-d);border-radius:999px;padding:7px 13px;font-family:'Baloo 2',cursive;font-weight:700;font-size:14px;cursor:pointer;}
+.dtabs button.on{background:var(--coral);color:#fff;border-color:var(--coral);}
+table.dt{width:100%;border-collapse:collapse;font-size:13.5px;}
+table.dt td,table.dt th{border-bottom:1.5px solid var(--line);padding:6px 5px;text-align:left;vertical-align:top;}
+table.dt th{font-family:'Baloo 2',cursive;color:var(--coral-d);}
+.checkrow{display:flex;gap:8px;align-items:flex-start;font-weight:700;font-size:14px;margin:7px 0;line-height:1.35;}
+.checkrow input{width:20px;height:20px;margin-top:1px;flex:0 0 auto;}
+footer.note{text-align:center;color:var(--ink2);font-size:12px;font-weight:700;padding:8px 20px 22px;line-height:1.5;}
+#confettiBox{position:fixed;inset:0;pointer-events:none;overflow:hidden;z-index:60;}
+#confettiBox span{position:absolute;top:-40px;font-size:24px;animation:cfall linear forwards;}
+@keyframes cfall{to{transform:translateY(108vh) rotate(340deg);}}
+.certbox{background:linear-gradient(160deg,#FFF6DE,#FFE9F1);border:3px solid var(--gold);border-radius:20px;padding:22px 16px;text-align:center;}
+.kidbtn{width:100%;margin:6px 0;}
+</style>
+</head>
+<body>
+<div id="confettiBox"></div>
+
+<!-- ================= ACCESS ================= -->
+<section class="screen on" id="scr-access">
+  <div class="access-hero">
+    <div class="ringwrap"><div class="inner"><div class="kiki-slot" id="kikiAccess"></div></div></div>
+    <h1>Sreshta Talks</h1>
+    <div class="sub">Face the Camera 🎬 Talk like a creator, in your own words!</div>
+  </div>
+  <div class="card center">
+    <div class="bubble" style="text-align:left;">Hi! I am <b>Kiki the Parrot</b> 🦜 I LOVE talking! Tap your button, type your secret PIN, and let us make a Talk together!</div>
+    <button class="btn big kidbtn" onclick="openPin('child')">🎬 I am Sreshta — Open My Studio</button>
+    <button class="btn soft big kidbtn" onclick="openPin('parent')">📊 Amma / Nanna — Parent Dashboard</button>
+    <p class="mut" style="margin-top:6px;">Every Talk is made by Sreshta, in Sreshta's own words. 🌟</p>
+  </div>
+</section>
+
+<!-- ================= PIN ================= -->
+<section class="screen" id="scr-pin">
+  <div class="card center" id="pinCard">
+    <div class="kiki-slot" id="kikiPin"></div>
+    <div class="bubble" id="pinBubble" style="text-align:left;margin-top:6px;">Enter your PIN!</div>
+    <div class="pindots" id="pinDots"></div>
+    <div class="mut" id="pinMsg">Tap the numbers</div>
+    <div class="pad" id="pinPad">
+      <button onclick="pinKey('1')">1</button><button onclick="pinKey('2')">2</button><button onclick="pinKey('3')">3</button>
+      <button onclick="pinKey('4')">4</button><button onclick="pinKey('5')">5</button><button onclick="pinKey('6')">6</button>
+      <button onclick="pinKey('7')">7</button><button onclick="pinKey('8')">8</button><button onclick="pinKey('9')">9</button>
+      <button onclick="pinKey('clr')">C</button><button onclick="pinKey('0')">0</button><button onclick="pinKey('del')">⌫</button>
+    </div>
+    <button class="btn soft small" onclick="show('scr-access')">← Back</button>
+  </div>
+</section>
+
+<!-- ================= CHILD HOME ================= -->
+<section class="screen" id="scr-home">
+  <div class="topbar">
+    <div class="kiki-slot" id="kikiHome"></div>
+    <div class="bubble grow" id="homeBubble">Hi Sreshta! Ready to talk to the camera today? 🎬</div>
+  </div>
+  <div id="applauseBanner"></div>
+  <div class="card" style="padding:10px;">
+    <div class="statgrid">
+      <div class="stat"><b id="stTalks">0</b><span>TALKS DONE 🎬</span></div>
+      <div class="stat"><b id="stTitle" style="font-size:14.5px;">Rising Creator</b><span>MY TITLE 👑</span></div>
+      <div class="stat"><b id="stStars">0 ⭐</b><span>MY STARS</span></div>
+    </div>
+    <div class="studio-lights" id="weekLights"></div>
+  </div>
+  <div id="todayZone"></div>
+  <div id="baselineZone"></div>
+  <div id="stageLists"></div>
+  <div id="trendZone"></div>
+  <div id="bestZone"></div>
+  <div id="firstZone"></div>
+  <div class="card center">
+    <button class="btn soft" onclick="show('scr-access')">🚪 Studio Door (switch person)</button>
+  </div>
+</section>
+
+<!-- ================= BASELINE ================= -->
+<section class="screen" id="scr-baseline">
+  <h2 class="baloo" style="color:var(--coral-d);">💎 My First Talks — Day 1</h2>
+  <p class="mut">Three tiny talks, totally your way. No tricks, no help — just you and the camera. These stay here forever, so one day you can see how far you flew! 🦜</p>
+  <div id="baseBody"></div>
+  <button class="btn big" id="baseDoneBtn" disabled onclick="saveBaseline()">✨ Save My First Talks</button>
+  <button class="btn soft big kidbtn" onclick="goHome()">← Back to Studio</button>
+</section>
+
+<!-- ================= MISSION ================= -->
+<section class="screen" id="scr-mission">
+  <div class="row">
+    <div class="kiki-slot" id="kikiMission"></div>
+    <div class="grow">
+      <h2 class="baloo" id="misTitle" style="color:var(--coral-d);font-size:20px;line-height:1.15;">Talk</h2>
+      <div class="mut" id="misMeta"></div>
+    </div>
+  </div>
+  <div class="steptabs" id="stepTabs"></div>
+  <div id="stepBody"></div>
+  <div class="row" style="margin-top:12px;">
+    <button class="btn soft" id="backBtn" onclick="stepBack()">← Back</button>
+    <span class="grow"></span>
+    <button class="btn" id="nextBtn" onclick="stepNext()">Next →</button>
+    <button class="btn gold" id="finishBtn" style="display:none;" onclick="finishTalk()">🎉 Finish My Talk!</button>
+  </div>
+  <button class="btn soft big kidbtn" onclick="goHome()">🏠 Studio Home</button>
+</section>
+
+<!-- ================= CERTIFICATE ================= -->
+<section class="screen" id="scr-cert">
+  <div class="certbox" id="certBox"></div>
+  <button class="btn big kidbtn" onclick="window.print()">🖨️ Print My Certificate</button>
+  <button class="btn soft big kidbtn" onclick="renderDash('overview');show('scr-dash')">📊 Back to Dashboard</button>
+</section>
+
+<!-- ================= DASHBOARD ================= -->
+<section class="screen" id="scr-dash">
+  <h2 class="baloo" style="color:var(--coral-d);">📊 Parent Dashboard</h2>
+  <p class="mut">Sreshta Talks — everything is at most 3 taps from here.</p>
+  <div class="dtabs" id="dashTabs"></div>
+  <div id="dashBody"></div>
+  <button class="btn soft big kidbtn" onclick="goHome()">🎬 Child Studio Home</button>
+  <button class="btn soft big kidbtn" onclick="show('scr-access')">🚪 Switch Person</button>
+</section>
+
+<footer class="note">Sreshta Talks: all talks and videos live on THIS device only (this page's local storage + video vault). Nothing is posted anywhere by this portal — posting on Instagram is always a separate parent decision.<br>Made with love for one rising creator. 🌟</footer>
+
+<script>
+"use strict";
+/* ================= KIKI THE PARROT (SVG) ================= */
+function kikiSVG(cls){
+  return '<svg class="kiki-svg '+(cls||"")+'" viewBox="0 0 160 172" role="img" aria-label="Kiki the Parrot">'
+  /* long tail feathers behind the body */
+  +'<g><path d="M70 118 Q58 148 54 168 Q64 170 70 150 Z" fill="#3FA7F5"/>'
+  +'<path d="M80 122 Q80 152 82 170 Q92 168 90 148 Z" fill="#2BB3A3"/>'
+  +'<path d="M90 118 Q104 146 108 164 Q98 168 90 148 Z" fill="#FF5A5F"/></g>'
+  /* perch */
+  +'<path d="M18 156 Q80 146 142 156" stroke="#A9713B" stroke-width="7" fill="none" stroke-linecap="round"/>'
+  /* body */
+  +'<ellipse cx="80" cy="106" rx="31" ry="40" fill="#37B34D"/>'
+  +'<ellipse cx="80" cy="114" rx="19" ry="28" fill="#C9F2CE"/>'
+  /* colourful wing, layered feathers */
+  +'<g class="wingR"><path d="M104 82 Q126 96 120 122 Q108 128 100 112 Q96 96 104 82Z" fill="#FF5A5F"/>'
+  +'<path d="M102 98 Q118 108 114 124 Q104 128 99 116 Q97 106 102 98Z" fill="#FF9F1C"/>'
+  +'<path d="M101 110 Q112 118 109 128 Q101 130 98 120 Q97 114 101 110Z" fill="#FFD23F"/></g>'
+  +'<path d="M56 84 Q38 98 46 120 Q58 124 64 108 Q66 94 56 84Z" fill="#2E9E44"/>'
+  /* feet on the perch */
+  +'<path d="M68 144 l0 8 M64 152 h9 M92 144 l0 8 M88 152 h9" stroke="#FF9F1C" stroke-width="3.4" stroke-linecap="round"/>'
+  /* head */
+  +'<circle cx="80" cy="52" r="31" fill="#43C465"/>'
+  /* crest feathers */
+  +'<g class="crest"><ellipse cx="63" cy="16" rx="6.5" ry="15" fill="#FF5A5F" transform="rotate(-18 63 16)"/>'
+  +'<ellipse cx="80" cy="10" rx="6.5" ry="16" fill="#FFD23F"/>'
+  +'<ellipse cx="97" cy="16" rx="6.5" ry="15" fill="#3FA7F5" transform="rotate(18 97 16)"/></g>'
+  /* cheeks */
+  +'<circle cx="55" cy="62" r="7" fill="#FFB3C2" opacity=".85"/><circle cx="105" cy="62" r="7" fill="#FFB3C2" opacity=".85"/>'
+  /* eyes with white parrot eye-rings */
+  +'<circle cx="66" cy="47" r="9" fill="#fff"/><circle cx="94" cy="47" r="9" fill="#fff"/>'
+  +'<circle cx="66" cy="48" r="4.6" fill="#331A22"/><circle cx="94" cy="48" r="4.6" fill="#331A22"/>'
+  +'<circle cx="67.8" cy="46.2" r="1.7" fill="#fff"/><circle cx="95.8" cy="46.2" r="1.7" fill="#fff"/>'
+  /* big hooked parrot beak */
+  +'<path d="M63 55 Q80 44 97 55 Q95 70 86 76 Q80 90 74 76 Q65 70 63 55Z" fill="#FF9F1C" stroke="#E07B00" stroke-width="2"/>'
+  +'<path d="M71 78 Q80 73 89 78 Q87 86 80 86 Q73 86 71 78Z" fill="#E07B00"/>'
+  +'</svg>';
+}
+var KIKI_LINES=[
+ "Hi Sreshta! Ready to talk to the camera today? 🎬",
+ "Creators always take 2 — retakes are NORMAL! 🎬",
+ "Look at the lens like it is your best friend! 💛",
+ "Your words, your talk, your style! 🌟",
+ "Smile first… then say your first line! 😊",
+ "A tiny talk is a BIG win! Keep going! 🎉"];
+var kikiIx=0;
+function paintKiki(){ document.querySelectorAll(".kiki-slot").forEach(function(el){ el.innerHTML=kikiSVG(el.id==="kikiMission"?"small":"");
+  el.querySelector("svg").addEventListener("click", kikiTap); }); }
+function kikiTap(ev){ var svg=ev.currentTarget; var acts=["hop","flap","laugh","bow"]; var a=acts[kikiIx%acts.length]; kikiIx++;
+  svg.classList.remove("hop","flap","laugh","bow"); void svg.getBoundingClientRect(); svg.classList.add(a);
+  var b=document.getElementById("homeBubble");
+  if(b && document.getElementById("scr-home").classList.contains("on")) b.textContent=KIKI_LINES[kikiIx%KIKI_LINES.length]; }
+
+/* ================= CREATOR TRICKS (spiral of 9 — exactly one per Talk) ================= */
+var TRICKS=[
+ {n:"Hook Line", t:"Start with your most exciting line FIRST! Your first line makes viewers stop and listen."},
+ {n:"Lens Is My Friend", t:"Look right at the little camera lens — and imagine your best friend's smiling face there."},
+ {n:"Smile, Then Start", t:"Before your first word: smile, take one breath, THEN talk. A smile at the start makes everything easier."},
+ {n:"Pause & Breathe", t:"Put a tiny pause between your points. Pauses make you sound sure and clear."},
+ {n:"Show & Tell", t:"Hold your thing up to the camera while you talk about it. Viewers love seeing the real thing!"},
+ {n:"Big Expression", t:"Let your face SHOW the feeling — happy, wow, funny, surprised. Your face is half the Talk!"},
+ {n:"Strong Ending", t:"Finish with a happy, strong last line — big smile, clear voice, no whisper at the end."},
+ {n:"Question Ending", t:"End by asking your viewers ONE question. Creators talk WITH people, not just TO them."},
+ {n:"Oops, Keep Going", t:"Forgot a line? No problem! Smile and keep going. Every real creator does this — it is a pro move!"}
+];
+
+/* ================= STAGES ================= */
+var STAGES=[
+ {n:1,name:"Hello, Camera",secs:15,aud:"Just for you — private and cosy"},
+ {n:2,name:"Tell Something",secs:30,aud:"Amma watches with you"},
+ {n:3,name:"Teach & Show",secs:35,aud:"Family Premiere Night audience"},
+ {n:4,name:"Story & Opinion",secs:45,aud:"Family watches — parents may pick a Talk to share"},
+ {n:5,name:"Real Creator",secs:55,aud:"Reel-ready — parents choose what to post"}];
+var TITLES=["Rising Creator","Camera Friend","Little Teller","Story Teller","Star Creator","Confident Creator"];
+var FORMATS=["About Me","Favourites","Tell & Tell","Teach & Show","Did You Know","Storytime","Try & Tell","Opinion","Get Ready & Talk","Q&A","Festival Talk","Character Talk","Show & Tell","Series"];
+var DIMS=["Looks at Camera","Clear & Natural","Brave & Steady","Own Words","Hook & Ending"];
+
+/* ================= THE 50 TALKS =================
+   t=title fmt=format tr=trick index model=model talk pts=3 point prompts
+   hook=on-screen hook text cap=caption first line fact=inside fact (Did You Know) */
+var TALKS=[
+/* ---- STAGE 1 : HELLO, CAMERA (10–20s) ---- */
+{t:"Hello, I'm Sreshta!",fmt:"About Me",tr:2,model:"Hi friends! I am Sreshta, and this is my very first Talk! I love dancing, drawing and telling you things. Today I just want to say hello — hello, hello, hello! See you in my next Talk!",pts:["My name and a big hello","Two things I love doing","A happy goodbye line"],hook:"Hi! I'm Sreshta! 👋",cap:"Meet Sreshta | My very first Talk — saying hello to the camera"},
+{t:"My Favourite Colour",fmt:"Favourites",tr:5,model:"My favourite colour is the colour of this thing in my hand! I love it because it looks happy and bright. I have so many things in this colour at home. Which colour is YOUR favourite?",pts:["Say my favourite colour","Show one thing in that colour","Tell why I love it"],hook:"My favourite colour is… 🎨",cap:"My favourite colour | Favourites Talk — tell me yours too"},
+{t:"My Favourite Food",fmt:"Favourites",tr:6,model:"Yummy alert! My favourite food is the one I can eat any time, any day! It tastes so good that my face does a happy dance. I love it hot and fresh. What food makes YOUR face happy?",pts:["Name my favourite food","Say how it tastes","Say when I love eating it"],hook:"My favourite food! 😋",cap:"Favourite food Talk | Yummy favourites with Sreshta"},
+{t:"My Favourite Song to Dance",fmt:"Favourites",tr:6,model:"This is my favourite song to dance to! When it starts, my feet start moving all by themselves. I love the beats and I love the happy feeling. One day I will show you my steps for it!",pts:["Name the song","Say what I feel when it plays","Say my favourite part of it"],hook:"My happy dance song! 🎵",cap:"My favourite dance song | Favourites Talk"},
+{t:"My Best Friend",fmt:"About Me",tr:0,model:"Today I will tell you about my best friend! She is funny, kind and always ready to play with me. We laugh a lot together, and we share our snacks and secrets. Best friends make every day better!",pts:["Say her first name","Say two nice things about her","Say what we love doing together"],hook:"My best friend! 💛",cap:"My best friend Talk | About the people we love"},
+{t:"My Favourite Dress",fmt:"Favourites",tr:5,model:"Look at my favourite dress! I love how it twirls when I turn around. The colour makes me feel like a star. I wear it on special happy days. Do you have a favourite dress too?",pts:["Show my favourite dress","Say its colour and what I love","Say when I wear it"],hook:"My favourite dress! 👗",cap:"Favourite dress Talk | Twirl and tell"},
+{t:"The Thing That Makes Me Laugh",fmt:"About Me",tr:6,model:"Ha ha ha! Some things make me laugh so much that my tummy hurts! Today I will tell you the funniest one. Even thinking about it makes me giggle. Ready? Listen to this!",pts:["Say the funny thing","Tell what happens","End with my biggest laugh"],hook:"This makes me LAUGH! 😂",cap:"What makes me laugh | Funny favourites Talk"},
+{t:"My Favourite Animal",fmt:"Favourites",tr:0,model:"My favourite animal is the cutest animal in the whole world! It is soft, funny and very clever. I love watching it play. If I could talk to it, I would say — I love you, little friend!",pts:["Name my favourite animal","Say two things it does","Say why I love it"],hook:"My favourite animal! 🐾",cap:"Favourite animal Talk | Cute animal facts and favourites"},
+{t:"My Favourite Toy",fmt:"Favourites",tr:5,model:"This is my favourite toy, and it goes everywhere with me! I got it on a very happy day, and I play with it all the time. It is my treasure. Let me show you what it can do!",pts:["Show my favourite toy","Say where I got it","Show or tell what it does"],hook:"My treasure toy! 🧸",cap:"My favourite toy | Show and tell Talk"},
+{t:"My Pick!",fmt:"Favourites",tr:7,model:"Today the topic is MY pick! I choose something I love, and I will talk about it for a full twenty seconds — my longest Talk yet! Watch me go, friends. And tell me — what would YOUR pick be?",pts:["Say the thing I picked","Say two things about it","Ask viewers their pick"],hook:"Today I pick the topic! ⭐",cap:"My Pick Talk | My choice, my words, my Talk"},
+/* ---- STAGE 2 : TELL SOMETHING (30s) ---- */
+{t:"3 Things I Love About Festivals",fmt:"Festival Talk",tr:0,model:"Festivals are my favourite days, and here are 3 things I love about them! One — yummy sweets. Two — dressing up in bright, twirly clothes. Three — everybody is happy and together. Festivals make my heart sparkle!",pts:["Point 1 — first thing I love","Point 2 — second thing I love","Point 3 — third thing, with a big smile"],hook:"3 things I LOVE about festivals! 🪔",cap:"3 things I love about festivals | Festival Talk for kids"},
+{t:"My Favourite Story",fmt:"Storytime",tr:3,model:"Let me tell you about my favourite story! It has a hero I love and a part that makes me go — wow! I have heard it so many times, and I still ask for it again. A story you want again and again is a real treasure.",pts:["Say the story's name","Say my favourite part","Say why I love it"],hook:"My favourite story! 📖",cap:"My favourite story Talk | Storytime with Sreshta"},
+{t:"My Best Day Ever",fmt:"Tell & Tell",tr:6,model:"I had the BEST day ever, and I must tell you about it! From the morning it was special. I laughed, I played, and something lovely happened that I will never forget. Days like that are gifts!",pts:["Say when the day was","Say two things that happened","Say why it was the best"],hook:"My BEST day ever! 🌈",cap:"My best day ever | Happy day Talk"},
+{t:"3 Things I Always Carry",fmt:"Show & Tell",tr:5,model:"Wherever I go, these 3 things come with me! Let me show you — one, two, three! Each one helps me or makes me happy. Peek into my little world, friends. What do YOU always carry?",pts:["Show thing number 1","Show thing number 2","Show thing number 3 and why"],hook:"3 things I always carry! 🎒",cap:"3 things I always carry | Show and tell Talk"},
+{t:"My Favourite Cartoon Character",fmt:"Character Talk",tr:6,model:"My favourite cartoon character is the funniest one on TV! I love how this character talks, walks and makes everyone laugh. Sometimes I copy the voice — listen to this line in that style! Who is your favourite?",pts:["Name the character","Say one funny thing it does","Copy one line in its style"],hook:"My favourite cartoon star! 📺",cap:"Favourite cartoon character Talk | Funny character fun"},
+{t:"If I Get One Wish...",fmt:"Tell & Tell",tr:3,model:"If I get ONE wish, I know exactly what I will ask for! It is something that would make me happy — and make other people happy too. I have thought about it a lot. Close your eyes and make your wish with me!",pts:["Say my one wish","Say why I picked it","Say who else it would make happy"],hook:"My ONE wish! ✨",cap:"If I get one wish | Dream Talk with Sreshta"},
+{t:"My Favourite Subject",fmt:"Tell & Tell",tr:0,model:"Today I will tell you my favourite subject! It is the one where my hand goes up fast — pick me, pick me! I love it because it feels like playing and learning at the same time. Learning is fun when your heart likes it!",pts:["Name my favourite subject","Say what we do in it","Say why I love it"],hook:"My favourite subject! ✏️",cap:"My favourite subject Talk | Learning is fun"},
+{t:"3 Foods I Love, 1 I Don't",fmt:"Try & Tell",tr:6,model:"Food game time! Here are 3 foods I love — yum, yum, yum! But there is ONE food that makes my face do THIS. Can you guess which faces are yummy and which one is the funny one? Watch my expressions!",pts:["Food I love number 1","Foods I love 2 and 3","The one food + my funny face"],hook:"3 yummy + 1 funny face! 😋",cap:"3 foods I love and 1 I don't | Funny food Talk"},
+{t:"Why I Love Dancing",fmt:"Opinion",tr:2,model:"People ask me — Sreshta, why do you love dancing? Here is my answer. When the music plays, my heart feels light and my feet feel happy. Dancing is how my body talks! That is why I love it, friends.",pts:["Say how music makes me feel","Say what my body does","Say my favourite thing about dancing"],hook:"Why I LOVE dancing! 💃",cap:"Why I love dancing | Talking about dance, in my own words"},
+{t:"My Drawing Talk",fmt:"Show & Tell",tr:5,model:"This is a drawing I made, and today I am its guide! Look at the colours I picked and the little details I hid inside. Drawing is like telling a story without words. Now I will tell you its story WITH words!",pts:["Show my drawing","Say what I drew and the colours","Say my favourite detail in it"],hook:"The story of my drawing! 🎨",cap:"My drawing Talk | The story behind my art"},
+/* ---- STAGE 3 : TEACH & SHOW (30–40s) ---- */
+{t:"Teach a Telugu Word",fmt:"Teach & Show",tr:5,model:"Welcome to Telugu class with Sreshta! Today's word is a happy word. Say it with me, slowly… one more time! Now you know how to say it in Telugu. Use it today and make someone smile!",pts:["Say today's Telugu word","Say what it means","Make viewers say it with me"],hook:"Learn a Telugu word! 🗣️",cap:"Teach a Telugu word | Learn Telugu with Sreshta"},
+{t:"Teach How to Draw a Flower",fmt:"Teach & Show",tr:5,model:"Grab a pencil — I will teach you to draw a flower! First a round happy centre. Then petals all around, one by one. Add a stem and two leaves… ta-da! Your flower is ready. Show it to someone you love!",pts:["Step 1 — the round centre","Step 2 — petals and stem","Step 3 — leaves and finishing smile"],hook:"Draw a flower with me! 🌸",cap:"How to draw a flower | Art teaching Talk for kids"},
+{t:"Did You Know? — a Peacock Fact",fmt:"Did You Know",tr:6,fact:"A peacock can open about 200 feathers in its grand tail fan, and each long feather has a shiny eye-spot on it!",model:"Did you know this about peacocks? A peacock can open about 200 feathers in its big tail fan — and every long feather has a shiny eye on it! Two hundred eyes looking at you! Isn't that the most fancy tail in the world?",pts:["Ask: did you know?","Tell the peacock fact","Say my wow line at the end"],hook:"Did you know? 🦚 200 feathers!",cap:"Did you know peacock fact | Amazing animal facts for kids"},
+{t:"Did You Know? — a Moon Fact",fmt:"Did You Know",tr:6,fact:"The Moon does not make its own light — it shines because sunlight bounces off it, like a giant mirror in the sky!",model:"Did you know this about the Moon? The Moon has no light of its own! It shines because the Sun's light bounces off it — like a giant mirror in the sky. So when you see the moonlight, you are seeing sunshine at night!",pts:["Ask: did you know?","Tell the Moon fact","Say the mirror line at the end"],hook:"Did you know? 🌙 Moon mirror!",cap:"Did you know Moon fact | Space facts for kids"},
+{t:"Teach How to Make a Paper Star",fmt:"Teach & Show",tr:5,model:"Let me teach you a paper star! Take a strip of paper and make a tiny knot — gently, gently. Tuck the end in, then pinch the five corners… pop! A little star is born. Make five and fill a jar of wishes!",pts:["Step 1 — the tiny knot","Step 2 — tuck and fold","Step 3 — pinch the corners, star is ready"],hook:"Make a paper star! ⭐",cap:"How to make a paper star | Craft teaching Talk"},
+{t:"Teach 3 Expressions",fmt:"Teach & Show",tr:6,model:"Faces can talk without words! Today I teach you 3 expressions. One — HAPPY: big smile, bright eyes! Two — SURPRISED: eyebrows up, mouth goes O! Three — ANGRY: eyebrows down, arms crossed! Your turn — show me your happy face!",pts:["Expression 1 — name it, show it","Expression 2 — name it, show it","Expression 3 — name it, show it"],hook:"3 expressions — your turn! 😊",cap:"Teach 3 expressions | Face acting fun for kids"},
+{t:"Counting 1–10 in Telugu",fmt:"Teach & Show",tr:3,model:"Let's count in Telugu, together! Follow my fingers and say it with me — one to ten, nice and slow first, then a happy fast round! Counting in two languages makes your brain super strong. Ready? Let's go!",pts:["Say: say it with me","Count slowly 1 to 10 in Telugu","Count one happy fast round"],hook:"Count in Telugu with me! 🔢",cap:"Counting 1 to 10 in Telugu | Learn and count along"},
+{t:"Did You Know? — an Elephant Fact",fmt:"Did You Know",tr:6,fact:"An elephant's trunk has no bones at all, and it can pick up something as small as a single blade of grass — and also lift a whole log!",model:"Did you know this about elephants? An elephant's trunk has NO bones! And with that soft trunk, it can pick up one tiny blade of grass — or lift a whole big log! Gentle and super strong at the same time. Wow, right?",pts:["Ask: did you know?","Tell the elephant fact","Say my gentle-and-strong ending"],hook:"Did you know? 🐘 No bones!",cap:"Did you know elephant fact | Amazing animal facts for kids"},
+{t:"Show & Tell — a Mystery Object",fmt:"Show & Tell",tr:0,model:"I am hiding something behind my back! It is my favourite thing from home, and I will give you 3 clues. Clue by clue, can you guess it? …Surprise! Here it is! Did you guess right, friends?",pts:["Say: I have a surprise","Give clue 1 and clue 2","Reveal it and say why I love it"],hook:"Guess what's behind my back! 🎁",cap:"Mystery object show and tell | Guess with me"},
+{t:"Teach a Good Habit",fmt:"Teach & Show",tr:3,model:"Today I teach you a good habit that makes you a star! It is small, it is easy, and you can start it today. Good habits are tiny steps that make you strong and kind. Let me show you how I do it!",pts:["Name the good habit","Show how I do it","Say why it matters"],hook:"A habit that makes you a star! 🌟",cap:"Teach a good habit | Small steps, big star"},
+/* ---- STAGE 4 : STORY & OPINION (40–50s) ---- */
+{t:"Storytime — a Funny Thing That Happened",fmt:"Storytime",tr:3,model:"Storytime! Something so funny happened to me that I still laugh when I remember it. It started on a normal day… then suddenly, everything went silly! Sit nicely, friends — you will laugh at the end, I promise!",pts:["Say where my story begins","Tell what funny thing happened","Tell the ending with a big laugh"],hook:"Storytime! A funny thing happened… 😂",cap:"Storytime funny incident | Real story Talk"},
+{t:"Retell a Story I Love",fmt:"Storytime",tr:3,model:"Today I will retell a story I love — in MY words! First, meet the hero. Then, the big problem comes! And at the end… well, you must listen to know. A good story is a gift — here is my gift to you!",pts:["Beginning — who is the hero","Middle — the big problem","End — how it finishes"],hook:"A story I love, in MY words! 📚",cap:"Retell a story Talk | Beginning middle end storytelling"},
+{t:"Try & Tell — a New Snack Review",fmt:"Try & Tell",tr:6,model:"Welcome to Sreshta's snack review! Today I try something new — live! First look… it looks yummy. First bite… hmm! Let me tell you honestly: the taste, the crunch, and my star score at the end. Watch my face — my face never lies!",pts:["Show the snack and say its name","Take a bite and tell the taste","Give my star score and final line"],hook:"Trying a new snack — LIVE review! 🍪",cap:"New snack review | Try and tell honest review Talk"},
+{t:"Try & Tell — a New Drink Review",fmt:"Try & Tell",tr:6,model:"Today my review cup has something new to drink! First, the colour — so pretty! Then, my first sip… wow, let me tell you the taste honestly. Sweet? Sour? Super? My face will tell you before my words do!",pts:["Show the drink and its colour","Take a sip and tell the taste","Give my score and recommendation line"],hook:"New drink — first sip review! 🥤",cap:"New drink review | Try and tell Talk"},
+{t:"My Opinion — Rainy Days Are the Best",fmt:"Opinion",tr:0,model:"Here is my opinion — rainy days are the BEST days! The sound of rain is like music, the air smells fresh, and hot snacks taste extra yummy. Some people like sunny days, and that is okay — but my heart votes for rain!",pts:["Say my opinion clearly","Give reason number 1","Give reason 2 and my voting line"],hook:"My opinion: rainy days WIN! 🌧️",cap:"My opinion rainy days | Opinion Talk for kids"},
+{t:"My Opinion — Why Dancing Makes Me Happy",fmt:"Opinion",tr:2,model:"My opinion is simple — dancing makes me the happiest girl in the room! When I dance, my worries run away and my smile comes running in. Everyone should dance a little every day. That is my opinion — what is yours?",pts:["Say my opinion","Say what happens to my worries","Ask viewers their opinion"],hook:"Dancing = happiness! My opinion 💃",cap:"Why dancing makes me happy | Opinion Talk"},
+{t:"Book Review Talk",fmt:"Try & Tell",tr:0,model:"Book review time! I finished a lovely book, and here is my honest review. The story, the pictures, my favourite page — I will tell you everything, but no ending spoilers! If you love stories, this book is a warm hug.",pts:["Say the book's name and topic","Say my favourite part or page","Give my score and who will love it"],hook:"Book review — no spoilers! 📖",cap:"Book review Talk | Books kids love"},
+{t:"Cartoon / Film Review Talk",fmt:"Try & Tell",tr:6,model:"I watched something super fun, and here is my review! The hero was brave, the funny parts made me roll with laughter, and my favourite scene is a secret I will only half-tell. My score comes at the end — wait for it!",pts:["Say what I watched","Say the funniest or best part","Give my score at the end"],hook:"My review — watch till the score! 🎬",cap:"Cartoon film review Talk | Honest kids review"},
+{t:"Get Ready & Talk — Festival Morning",fmt:"Get Ready & Talk",tr:2,model:"Get ready with me — it's festival morning! While I get ready, let me tell you why today is special. New clothes, happy smells from the kitchen, and celebrations coming! Festival mornings are pure magic, friends.",pts:["Say which festival day it is","Tell one thing I am doing to get ready","Tell what I am excited about"],hook:"Get ready with me — festival day! ✨",cap:"Get ready and talk festival morning | Festival GRWM Talk"},
+{t:"Character Talk — Pick a Character!",fmt:"Character Talk",tr:6,model:"Today I am not Sreshta — I am a character! Watch my voice change, watch my face change… I will talk to you as a shopkeeper, a teacher, or a news reader. Acting is telling with your whole self. Which character should I be next?",pts:["Say who my character is","Talk like the character","Ask viewers the next character"],hook:"Today I am NOT Sreshta! 🎭",cap:"Character Talk | Acting as a shopkeeper teacher news reader"},
+/* ---- STAGE 5 : REAL CREATOR (45–60s) ---- */
+{t:"Dussehra Talk — 5 Things I Love",fmt:"Festival Talk",tr:0,model:"Happy Dussehra, friends! Today, my first real Talk — 5 things I love about Dussehra! The stories of good winning, the bright clothes, the sweets, the lights, and being together with family. May good always win in your life too!",pts:["Wish everyone Happy Dussehra","Tell my 5 things, counting on fingers","End with a good-wins blessing line"],hook:"5 things I love about Dussehra! 🏹",cap:"Dussehra Talk | 5 things I love about Dussehra festival"},
+{t:"Diwali Talk — Why We Light Diyas",fmt:"Festival Talk",tr:0,model:"Happy Diwali! Do you know why we light diyas? Each little lamp says — light wins over darkness, and good wins over everything dark. When our home glows with diyas, my heart glows too. Let me tell you more!",pts:["Wish everyone Happy Diwali","Tell why we light diyas","Tell my favourite Diwali thing"],hook:"Why do we light diyas? 🪔",cap:"Diwali Talk why we light diyas | Festival Talk for kids"},
+{t:"Festival Wishes Talk",fmt:"Festival Talk",tr:7,model:"This Talk is a gift — my festival wishes for YOU! May your day be sweet, your home be happy, and your heart be full of light. From my family to yours, with a big smile — happy festival, friends! Tell me, how are you celebrating?",pts:["Say my festival wish line","Say two sweet wishes for viewers","Ask how they are celebrating"],hook:"My wishes for YOU! 🎁",cap:"Festival wishes Talk | Wishes from my family to yours"},
+{t:"Answer a Viewer Question",fmt:"Q&A",tr:7,model:"Question time! A viewer asked me a lovely question, and today I answer it — honestly, in my own words! I love your questions, friends. Listen to my answer… and if you have one more question, my Amma will read it to me!",pts:["Read the question Amma picked","Give my honest answer","Say thank you and ask for more questions"],hook:"You asked — I answer! ❓",cap:"Answer a viewer question | Q and A Talk with Sreshta"},
+{t:"Question of the Day",fmt:"Q&A",tr:7,model:"Today I ask the question! Here is my Question of the Day for you, friends. Think nicely, and tell your answer to your Amma or in the comments with your parents. My answer comes at the end — no peeking!",pts:["Ask my question of the day","Give two fun example answers","Give MY answer at the end"],hook:"MY question for YOU today! 🤔",cap:"Question of the day | Ask and answer Talk"},
+{t:"Mystery Card Talk",fmt:"Tell & Tell",tr:8,mystery:"My favourite game — and how to play it",model:"Kiki gave an EXAMPLE topic for this Talk — my real topic is a surprise card! When I open it, I get 30 seconds to think, then I talk like a creator. No fear — I have done 45 Talks to get ready for this one!",pts:["Read my mystery card slowly","Think: my 3 points about it","Talk happily to the end"],hook:"A surprise topic! 🎴",cap:"Mystery card Talk | Surprise topic on the spot"},
+{t:"Series Starter — Did You Know? with Sreshta",fmt:"Series",tr:0,fact:"A group of parrots is called a pandemonium — and parrots can learn to say real words, just like Kiki!",model:"Welcome to Episode 1 of Did You Know? with Sreshta! Every episode, one amazing fact. Today's fact — a group of parrots is called a pandemonium, and parrots can learn real words! This is now MY series, friends. Episode 2 is coming!",pts:["Welcome viewers to Episode 1","Tell today's amazing fact","Promise Episode 2 happily"],hook:"Ep.1 — Did You Know? with ME! 🦜",cap:"Did You Know with Sreshta Episode 1 | My own series starts"},
+{t:"Series Starter — One Telugu Word with Sreshta",fmt:"Series",tr:5,model:"Welcome to Episode 1 of One Telugu Word with Sreshta! Every episode, I teach you one happy Telugu word. Today's word is my favourite greeting word. Say it with me two times… You did it! See you in Episode 2!",pts:["Welcome viewers to Episode 1","Teach today's Telugu word","Promise Episode 2 happily"],hook:"Ep.1 — Learn Telugu with ME! 🗣️",cap:"One Telugu word with Sreshta Episode 1 | Telugu learning series"},
+{t:"My Art Gallery Tour",fmt:"Show & Tell",tr:5,model:"Welcome to my art gallery! I am your guide today. Here is my first framed drawing… and here is my favourite one! I made all of these with my own hands, and each one has a story. Walk with me, art lovers!",pts:["Welcome viewers to my gallery","Show and tell drawing number 1","Show my favourite and end proudly"],hook:"Welcome to MY art gallery! 🖼️",cap:"My art gallery tour | Talking tour of my drawings"},
+{t:"Graduation Talk — My Choice!",fmt:"About Me",tr:7,custom:true,model:"Friends, this is my Graduation Talk — Talk number 50! Today the topic is MY choice, and I will talk for a full minute, all by myself, with a happy brave heart. I started with a tiny hello… and look at me now! Thank you for listening to me grow!",pts:["The topic I choose is…","My 3 points about my topic","My thank-you ending line"],hook:"Talk 50 — MY choice! 🎓",cap:"Graduation Talk number 50 | My choice my words my Talk"}
+];
+
+/* ================= STATE ================= */
+var LS="talks_";
+var CHILD_PIN="2017", PARENT_PIN="2208";
+function defState(){ return { baselineDone:false, baselineDate:"", baselineLive:false,
+  talks:{}, stars:0, talkCount:0, points:{}, starred:[], studioDates:{},
+  nextReward:"A creator treat she chooses — set by Amma & Nanna 🎁",
+  rewards:["A small tripod 📸","Her own ring light 💡","A creator notebook 📓","A real mic 🎤","A series-launch family celebration 🎉"],
+  applause:"", applauseSeen:true, posts:{}, trend:[], premieres:[], recs:[], seq:0 }; }
+var S;
+function lsGet(k){ try{ var v=localStorage.getItem(LS+k); return v?JSON.parse(v):null; }catch(e){ return null; } }
+function lsSet(k,v){ try{ localStorage.setItem(LS+k, JSON.stringify(v)); }catch(e){} }
+function save(){ lsSet("state", S); }
+function load(){ S = lsGet("state") || defState();
+  var d=defState(); for(var k in d){ if(S[k]===undefined) S[k]=d[k]; }
+  if(!S.talks) S.talks={}; if(!S.points) S.points={}; if(!S.recs) S.recs=[]; if(!S.trend) S.trend=[]; }
+function todayKey(){ var d=new Date(); return d.getFullYear()+"-"+(d.getMonth()+1)+"-"+d.getDate(); }
+function ymKey(ds){ var p=String(ds).split("-"); return p[0]+"-"+p[1]; }
+function weekDates(){ var d=new Date(), out=[]; var day=(d.getDay()+6)%7; var mon=new Date(d); mon.setDate(d.getDate()-day);
+  for(var i=0;i<7;i++){ var t=new Date(mon); t.setDate(mon.getDate()+i); out.push(t.getFullYear()+"-"+(t.getMonth()+1)+"-"+t.getDate()); } return out; }
+function stageOfTalk(ix){ return Math.floor(ix/10)+1; }
+function talkId(ix){ return "talk"+(ix+1); }
+function talkDone(ix){ return !!(S.talks[talkId(ix)] && S.talks[talkId(ix)].done); }
+function talkUnlocked(ix){ if(!S.baselineDone) return false; if(ix===0) return true; return talkDone(ix-1); }
+function stageDoneCount(){ var c=0; for(var st=0;st<5;st++){ var all=true; for(var i=0;i<10;i++){ if(!talkDone(st*10+i)) all=false; } if(all) c++; } return c; }
+function curTitle(){ return TITLES[stageDoneCount()]; }
+function totalTalkSecs(){ var s=0; TALKS.forEach(function(t,ix){ if(talkDone(ix)) s+=STAGES[stageOfTalk(ix)-1].secs; }); return s; }
+function nextTalkIx(){ for(var i=0;i<50;i++){ if(!talkDone(i)) return i; } return -1; }
+function rateVal(r){ return r==="Pro"?3:(r==="Good"?2:(r==="Growing"?1:0)); }
+function recs(){ if(!S.recs) S.recs=[]; return S.recs; }
+function addRec(id,kind,tid,label,secs,live){ var rs=recs();
+  for(var i=0;i<rs.length;i++){ if(rs[i].id===id){ rs[i].date=todayKey(); rs[i].live=!!live; save(); return; } }
+  rs.push({id:id,kind:kind,talkId:tid||"",label:label,date:todayKey(),secs:secs||0,live:!!live}); save(); }
+function esc(s){ return String(s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;"); }
+
+/* ================= INDEXEDDB (video vault) ================= */
+var IDB={ db:null, opening:false,
+  open:function(cb){ if(IDB.db){ if(cb)cb(true); return; } if(IDB.opening){ setTimeout(function(){ IDB.open(cb); },60); return; }
+    try{ if(typeof indexedDB==="undefined"||!indexedDB){ if(cb)cb(false); return; } IDB.opening=true;
+      var r=indexedDB.open("talks-db",1);
+      r.onupgradeneeded=function(){ try{ r.result.createObjectStore("video"); }catch(e){} };
+      r.onsuccess=function(){ IDB.db=r.result; IDB.opening=false; if(cb)cb(true); };
+      r.onerror=function(){ IDB.opening=false; if(cb)cb(false); };
+    }catch(e){ IDB.opening=false; if(cb)cb(false); } },
+  put:function(id,blob,cb){ IDB.open(function(ok){ if(!ok||!IDB.db){ if(cb)cb(false); return; }
+    try{ var tx=IDB.db.transaction("video","readwrite"); tx.objectStore("video").put(blob,id);
+      tx.oncomplete=function(){ if(cb)cb(true); }; tx.onerror=function(){ if(cb)cb(false); };
+    }catch(e){ if(cb)cb(false); } }); },
+  get:function(id,cb){ IDB.open(function(ok){ if(!ok||!IDB.db){ cb(null); return; }
+    try{ var rq=IDB.db.transaction("video").objectStore("video").get(id);
+      rq.onsuccess=function(){ cb(rq.result||null); }; rq.onerror=function(){ cb(null); };
+    }catch(e){ cb(null); } }); },
+  del:function(id){ IDB.open(function(ok){ if(!ok||!IDB.db) return; try{ IDB.db.transaction("video","readwrite").objectStore("video").delete(id); }catch(e){} }); }
+};
+
+/* ================= NAV ================= */
+function show(id){ document.querySelectorAll(".screen").forEach(function(s){ s.classList.remove("on"); });
+  var el=document.getElementById(id); if(el) el.classList.add("on"); try{ window.scrollTo(0,0); }catch(e){} }
+function celebrate(){ var box=document.getElementById("confettiBox"); if(!box) return; box.innerHTML="";
+  var em=["🎬","⭐","💛","🎉","🦜","✨","💖"];
+  for(var i=0;i<26;i++){ var s=document.createElement("span"); s.textContent=em[i%em.length];
+    s.style.left=(Math.random()*96)+"%"; s.style.animationDuration=(1.4+Math.random()*1.4)+"s";
+    s.style.animationDelay=(Math.random()*0.5)+"s"; box.appendChild(s); }
+  setTimeout(function(){ box.innerHTML=""; },3600); }
+
+/* ================= PIN FLOW ================= */
+var pinTarget=null, pinBuf="";
+function renderPinDots(){ var d=document.getElementById("pinDots"); d.innerHTML="";
+  for(var i=0;i<4;i++){ var s=document.createElement("span"); s.className="pindot"+(i<pinBuf.length?" f":""); d.appendChild(s); } }
+function openPin(target){ pinTarget=target; pinBuf=""; renderPinDots();
+  document.getElementById("pinBubble").innerHTML = target==="parent"
+    ? "Hello Amma / Nanna! Enter the <b>Parents PIN</b> for the Dashboard 📊"
+    : "Hi Sreshta! Enter <b>your</b> secret PIN, creator star! 🔐";
+  document.getElementById("pinMsg").textContent="Tap the numbers";
+  show("scr-pin"); }
+function pinKey(k){ if(k==="clr"){ pinBuf=""; }
+  else if(k==="del"){ pinBuf=pinBuf.slice(0,-1); }
+  else if(pinBuf.length<4){ pinBuf+=k; }
+  renderPinDots();
+  if(pinBuf.length===4){
+    if(pinTarget==="child" && pinBuf===CHILD_PIN){ pinBuf=""; goHome(); }
+    else if(pinTarget==="parent" && pinBuf===PARENT_PIN){ pinBuf=""; renderDash("overview"); show("scr-dash"); }
+    else { document.getElementById("pinMsg").textContent="Hmm, that PIN did not match. Try again, you can do it! 💪";
+      var c=document.getElementById("pinCard"); c.classList.add("shake"); setTimeout(function(){ c.classList.remove("shake"); },450);
+      pinBuf=""; renderPinDots(); } } }
+
+/* ================= TALK RECORDER (up to 3 takes, she picks the best) ================= */
+function makeTalkRecorder(container, opts){
+  var ctl={ takes:[], bestIx:-1, liveDone:false, recording:false, stream:null, mr:null, chunks:[], single:!!opts.single };
+  function msg(t){ var m=container.querySelector('[data-role="msg"]'); if(m) m.textContent=t; }
+  function hasTake(){ return ctl.takes.length>0 || ctl.liveDone; }
+  function ui(){
+    var h='<div class="viewfinder"><span class="vf-corner vf-tl"></span><span class="vf-corner vf-tr"></span><span class="vf-corner vf-bl"></span><span class="vf-corner vf-br"></span>'
+      +'<div class="row"><span class="recdot"><i></i>'+(ctl.recording?"REC":"READY")+'</span><span class="grow"></span><span style="font-weight:800;font-size:13px;">📷 Face the camera, superstar!</span></div>'
+      +'<div style="text-align:center;padding:16px 6px 10px;font-family:\'Baloo 2\',cursive;font-size:19px;">'+(ctl.recording?"🎬 You are ON AIR! Talk, talk, talk!":"Smile… and press Record when ready 💛")+'</div></div>';
+    h+='<div class="row" style="margin-top:9px;"><button class="btn '+(ctl.recording?"gold":"")+'" data-act="rec">'+(ctl.recording?"⏹ Stop":"🎬 Record")+'</button>';
+    if(ctl.bestIx>=0 && ctl.takes[ctl.bestIx] && ctl.takes[ctl.bestIx].blob) h+='<button class="btn soft" data-act="playbest">▶️ Watch My Best Take</button>';
+    h+='</div>';
+    if(!ctl.single && ctl.takes.length) h+='<div class="mut" style="margin-top:7px;color:#8A5A6B;">Tap a take to make it your ⭐ BEST take:</div>';
+    h+='<div data-role="takes">';
+    ctl.takes.forEach(function(tk,i){ h+='<button class="takechip'+(i===ctl.bestIx?" best":"")+(tk.live?" live":"")+'" data-take="'+i+'">'+(tk.live?"🎤 Live take ":"Take "+(i+1)+" ")+(i===ctl.bestIx?"⭐ BEST":"")+'</button>'; });
+    h+='</div>';
+    if(opts.allowLive) h+='<div style="margin-top:8px;"><label style="font-weight:800;font-size:14.5px;"><input type="checkbox" data-act="live"'+(ctl.liveDone?" checked":"")+'> I talked live to Amma instead 💛</label></div>';
+    h+='<div class="mut" data-role="msg" style="margin-top:6px;"></div><video class="talkvideoc" data-role="video" controls style="display:none;width:100%;border-radius:12px;background:#000;margin-top:8px;"></video>';
+    container.innerHTML=h; bind();
+  }
+  function bind(){
+    var rb=container.querySelector('[data-act="rec"]'); if(rb) rb.addEventListener("click", toggle);
+    var pb=container.querySelector('[data-act="playbest"]'); if(pb) pb.addEventListener("click", playBest);
+    var lv=container.querySelector('[data-act="live"]'); if(lv) lv.addEventListener("change", function(){ ctl.liveDone=lv.checked; if(opts.onChange)opts.onChange(ctl); ui(); });
+    container.querySelectorAll("[data-take]").forEach(function(c){ c.addEventListener("click", function(){ ctl.bestIx=parseInt(c.getAttribute("data-take"),10); ui(); if(opts.onChange)opts.onChange(ctl); }); });
+  }
+  function toggle(){ if(ctl.recording) stop(); else start(); }
+  function maxed(){ var m=ctl.single?1:(opts.maxTakes||3); return ctl.takes.length>=m; }
+  function start(){
+    if(maxed()){ msg(ctl.single?"One lovely take is saved here! 💛":"Three takes is the creator way — pick your best! ⭐"); return; }
+    if(window.__FAKE_REC_BLOB__){ ctl.recording=true; ui(); msg("On air… (test camera) 🎬"); return; }
+    if(!navigator.mediaDevices || !window.MediaRecorder){ msg("This device has no camera recording here — use the live-to-Amma tick instead! 💛"); return; }
+    navigator.mediaDevices.getUserMedia({video:true,audio:true}).then(function(stream){
+      ctl.stream=stream; ctl.chunks=[];
+      ctl.mr=new MediaRecorder(stream);
+      ctl.mr.ondataavailable=function(e){ if(e.data && e.data.size) ctl.chunks.push(e.data); };
+      ctl.mr.onstop=function(){ var b=new Blob(ctl.chunks,{type:ctl.mr.mimeType||"video/webm"});
+        if(ctl.stream) ctl.stream.getTracks().forEach(function(t){ t.stop(); });
+        ctl.recording=false; pushTake({blob:b}); };
+      ctl.mr.start(); ctl.recording=true; ui(); msg("On air! Talk like a creator! 🎬");
+    }).catch(function(){ msg("Camera is off here — use the live-to-Amma tick instead! 💛"); });
+  }
+  function pushTake(tk){ ctl.takes.push(tk); ctl.bestIx=ctl.takes.length-1; ui(); if(opts.onChange)opts.onChange(ctl); }
+  function stop(){
+    if(window.__FAKE_REC_BLOB__ && ctl.recording){ ctl.recording=false; pushTake({blob:window.__FAKE_REC_BLOB__}); return; }
+    if(ctl.mr && ctl.recording){ ctl.mr.stop(); } }
+  function playBest(){ var tk=ctl.takes[ctl.bestIx]; if(!tk||!tk.blob) return;
+    var v=container.querySelector('[data-role="video"]'); v.src=objURL(tk.blob); v.style.display="block"; v.play(); }
+  function playInto(videoEl, cb){ var tk=ctl.takes[ctl.bestIx];
+    if(tk && tk.blob){ videoEl.src=objURL(tk.blob); videoEl.style.display="block"; if(cb)cb(true); }
+    else if(cb) cb(false); }
+  function bestBlob(){ var tk=ctl.takes[ctl.bestIx]; return tk?tk.blob||null:null; }
+  ctl.ui=ui; ctl.start=start; ctl.stop=stop; ctl.playBest=playBest; ctl.playInto=playInto; ctl.bestBlob=bestBlob; ctl.hasTake=hasTake;
+  ui(); return ctl;
+}
+function objURL(blob){ try{ return URL.createObjectURL(blob); }catch(e){ return ""; } }
+function playRecInto(videoEl, recId){
+  IDB.get(recId, function(blob){ if(blob && videoEl){ videoEl.src=objURL(blob); videoEl.style.display="block"; }
+    else if(videoEl){ videoEl.style.display="none"; } });
+}
+
+/* ================= HOME ================= */
+function renderHome(){
+  document.getElementById("stTalks").textContent=S.talkCount;
+  document.getElementById("stTitle").textContent=curTitle();
+  document.getElementById("stStars").textContent=S.stars+" ⭐";
+  var wd=weekDates(), dn=["Mon","Tue","Wed","Thu","Fri","Sat","Sun"], lh="";
+  wd.forEach(function(dt,i){ var lit=!!S.studioDates[dt];
+    lh+='<div class="sl'+(lit?" lit":" dim")+'"><i></i>'+dn[i]+'</div>'; });
+  document.getElementById("weekLights").innerHTML=lh;
+  /* applause */
+  var ab=document.getElementById("applauseBanner");
+  if(S.applause && !S.applauseSeen){ ab.innerHTML='<div class="card" style="background:#FFF6DE;border-color:var(--gold);"><b>💛 Nanna\'s Applause:</b> “'+esc(S.applause)+'” <button class="btn gold small" id="applauseOk">Love it! 💛</button></div>';
+    document.getElementById("applauseOk").addEventListener("click", function(){ S.applauseSeen=true; save(); renderHome(); });
+  } else ab.innerHTML="";
+  /* today's talk / baseline zone */
+  var tz=document.getElementById("todayZone"), bz=document.getElementById("baselineZone");
+  if(!S.baselineDone){
+    tz.innerHTML=""; bz.innerHTML='<div class="framebox"><h3 class="baloo" style="color:#B97A00;">💎 First: My First Talks (Day 1)</h3>'
+      +'<p class="mut">Before Talk 1 opens, record your 3 tiny Day-1 talks — totally your way. They stay locked in gold forever!</p>'
+      +'<button class="btn gold big kidbtn" onclick="openBaseline()">💎 Record My First Talks</button></div>';
+  } else {
+    bz.innerHTML="";
+    var ix=nextTalkIx();
+    if(ix<0){ tz.innerHTML='<div class="todaytalk"><div class="coverart"><span class="fmt">🎓 ALL 50 TALKS DONE</span><h3>You are a Confident Creator!</h3><div class="sec">Every Talk is complete — time for a Premiere Night party! 🎉</div></div></div>'; }
+    else { var t=TALKS[ix], st=STAGES[stageOfTalk(ix)-1];
+      tz.innerHTML='<div class="todaytalk"><div class="row" style="padding:2px 4px 0;"><span class="recdot"><i></i>IN THE STUDIO</span><span class="grow"></span><span style="font-weight:800;font-size:12.5px;">Stage '+st.n+" · "+st.name+'</span></div>'
+      +'<div class="coverart"><span class="fmt">'+esc(t.fmt)+'</span><h3>'+esc(t.t)+'</h3><div class="sec">⏱ about '+st.secs+' seconds · Talk '+(ix+1)+' of 50</div></div>'
+      +'<button class="btn big kidbtn" style="margin:4px;" onclick="startTalk('+ix+')">🎬 Start Today\'s Talk</button></div>';
+    }
+  }
+  /* stage lists */
+  var html="";
+  for(var s=1;s<=5;s++){ var stg=STAGES[s-1];
+    html+='<div class="stagehead"><h3>Stage '+s+" · "+stg.name+'</h3><span class="aud">👀 '+esc(stg.aud)+'</span></div><div class="talkgrid">';
+    for(var i=0;i<10;i++){ var jx=(s-1)*10+i, tk=TALKS[jx], done=talkDone(jx), un=talkUnlocked(jx);
+      var pct=S.posts["rec_"+talkId(jx)];
+      html+='<div class="talkcard'+(done?" done":(un?"":" lockd"))+'" '+(un?'onclick="startTalk('+jx+')"':'')+'>'
+        +(done && s>=2 && pct && pct.status==="waiting"?'<span class="badge ready">POST-READY 📮</span>':(done?'<span class="badge">DONE ⭐</span>':""))
+        +'<div class="tnum">TALK '+(jx+1)+(done?"":" · "+stg.secs+"s")+'</div><h4>'+esc(tk.t)+'</h4><div class="tfmt">'+esc(tk.fmt)+(un?"":" · 🔒 finish Talk "+jx+" first")+'</div></div>';
+    }
+    html+="</div>";
+  }
+  document.getElementById("stageLists").innerHTML=html;
+  /* trend talks */
+  var tzn=document.getElementById("trendZone");
+  if(S.trend.length){ var th='<div class="stagehead"><h3>🔥 My Trend Talks</h3><span class="aud">fresh from Instagram, via Amma & Nanna</span></div><div class="talkgrid">';
+    S.trend.forEach(function(tr){ var dn2=!!(S.talks[tr.id]&&S.talks[tr.id].done);
+      th+='<div class="talkcard'+(dn2?" done":"")+'" onclick="startTrend(\''+tr.id+'\')"><div class="tnum">TREND TALK</div><h4>'+esc(tr.topic)+'</h4><div class="tfmt">'+esc(tr.format||"Instagram Talk")+'</div></div>'; });
+    th+="</div>"; tzn.innerHTML=th;
+  } else tzn.innerHTML="";
+  /* best talks shelf */
+  var bz2=document.getElementById("bestZone");
+  if(S.starred.length){ var sh='<h3 class="baloo" style="color:var(--coral-d);margin-top:14px;">🌟 My Best Talks</h3><div class="shelf">';
+    S.starred.forEach(function(rid){ var r=recs().filter(function(x){ return x.id===rid; })[0]; if(r) sh+='<div class="mini"><span class="st">🎬</span><br>'+esc(r.label)+'</div>'; });
+    sh+="</div>"; bz2.innerHTML=sh;
+  } else bz2.innerHTML="";
+  /* first talks frame */
+  var fz=document.getElementById("firstZone");
+  if(S.baselineDone){ fz.innerHTML='<div class="framebox"><h3 class="baloo" style="color:#B97A00;">💎 My First Talks — locked in gold</h3><p class="mut">Day 1 · '+esc(S.baselineDate)+' · These never change. Look how far you fly! 🦜</p></div>'; }
+  else fz.innerHTML="";
+}
+function goHome(){ renderHome(); show("scr-home"); }
+
+/* ================= BASELINE ================= */
+var BASE_TALKS=[
+ {id:"baseline1",t:"B1 · Hello Talk",hint:"Say hello and who you are — your way!"},
+ {id:"baseline2",t:"B2 · My Favourite Thing",hint:"Talk about one favourite thing you love."},
+ {id:"baseline3",t:"B3 · Tell About a Picture",hint:"Look at a picture (this parrot card counts!) and tell all about it."}];
+var baseRecs=[];
+function openBaseline(){
+  var body=document.getElementById("baseBody"); body.innerHTML=""; baseRecs=[];
+  BASE_TALKS.forEach(function(b,i){
+    var card=document.createElement("div"); card.className="card";
+    card.innerHTML='<h3 class="baloo" style="color:var(--coral-d);">'+b.t+'</h3><p class="mut">'+b.hint+'</p><div id="baseRec'+i+'"></div>';
+    body.appendChild(card);
+    baseRecs.push(makeTalkRecorder(card.querySelector("#baseRec"+i), { allowLive:true, single:false, maxTakes:1,
+      onChange:function(){ updBaseBtn(); } }));
+  });
+  updBaseBtn(); show("scr-baseline");
+}
+function updBaseBtn(){ var okAll=baseRecs.length===3 && baseRecs.every(function(r){ return r.hasTake(); });
+  document.getElementById("baseDoneBtn").disabled=!okAll; }
+function saveBaseline(){
+  if(S.baselineDone){ goHome(); return; }
+  BASE_TALKS.forEach(function(b,i){ var r=baseRecs[i]; if(!r) return;
+    var blob=r.bestBlob();
+    var live=!blob;
+    addRec(b.id,"baseline","",b.t+" — Day 1",15,live);
+    if(blob) IDB.put(b.id, blob, function(){});
+  });
+  S.baselineDone=true; S.baselineDate=todayKey(); S.baselineLive=baseRecs.every(function(r){ return !r.bestBlob(); });
+  S.studioDates[todayKey()]=true; save(); celebrate(); goHome();
+}
+
+/* ================= MISSION FLOW ================= */
+var STEP_NAMES=["Watch a Talk","Creator Trick","My 3 Points","Practice Face","Shoot My Talk","Watch Myself","Creator Review"];
+var CUR=null;
+function startTalk(ix){ if(!talkUnlocked(ix)) return;
+  var prev=S.talks[talkId(ix)]||{};
+  CUR={ kind:"talk", ix:ix, id:talkId(ix), obj:TALKS[ix], stage:stageOfTalk(ix), step:0, rec:null, check:prev.review||{}, liked:prev.liked||"", performed:false };
+  showMission();
+}
+function startTrend(tid){ var tr=S.trend.filter(function(x){ return x.id===tid; })[0]; if(!tr) return;
+  var cstage=Math.min(5, stageDoneCount()+1);
+  var obj={ t:tr.topic, fmt:tr.format||"Instagram Talk", tr:(S.seq||0)%9,
+    model:"Here is an EXAMPLE of today's style — the real topic is on your card! Start with a hook line, say your 3 points in your own words, and finish with a happy ending. Amma and Kiki are listening — go, creator!",
+    pts:["Say your hook line about the topic","Say your point 2 about the topic","Say your point 3 and a happy ending"],
+    hook:"Today's Trend Talk! 🔥", cap:"Trend Talk with Sreshta | Talking in the style everyone loves" };
+  var prevT=S.talks[tid]||{};
+  CUR={ kind:"trend", ix:-1, id:tid, obj:obj, stage:cstage, step:0, rec:null, check:prevT.review||{}, liked:prevT.liked||"", performed:false };
+  showMission();
+}
+function showMission(){ paintKiki();
+  var t=CUR.obj;
+  document.getElementById("misTitle").textContent="Talk "+(CUR.kind==="talk"?(CUR.ix+1):"🔥")+": "+t.t;
+  document.getElementById("misMeta").textContent="Stage "+CUR.stage+" · "+STAGES[CUR.stage-1].name+" · "+esc(t.fmt)+" · about "+STAGES[CUR.stage-1].secs+" seconds";
+  renderStep(); show("scr-mission");
+}
+function renderTabs(){ var h=""; for(var i=0;i<7;i++){ h+='<span class="'+(i<CUR.step?"done":(i===CUR.step?"now":""))+'"></span>'; }
+  document.getElementById("stepTabs").innerHTML=h; }
+function renderStep(){
+  renderTabs();
+  var t=CUR.obj, body=document.getElementById("stepBody");
+  document.getElementById("finishBtn").style.display = CUR.step===6 ? "" : "none";
+  document.getElementById("nextBtn").style.display = CUR.step===6 ? "none" : "";
+  document.getElementById("backBtn").style.visibility = CUR.step===0 ? "hidden" : "visible";
+  var next=document.getElementById("nextBtn"); next.disabled=false;
+  var head='<div class="stepname">Step '+(CUR.step+1)+" of 7 · "+STEP_NAMES[CUR.step]+'</div>';
+  if(CUR.step===0){ /* WATCH A TALK */
+    var model=t.model, hook=model.split(". ")[0]+".";
+    var rest=model.slice(hook.length);
+    body.innerHTML=head+'<div class="bubble">Kiki shows you a Talk like yours. Watch the <b>first line</b> — that is the hook! 🦜</div>'
+      +(t.mystery?'<div class="trickbox" style="margin-top:9px;">🎴 <b>Your Mystery Card says:</b> “'+esc(t.mystery)+'” — you get thinking time in Step 3!</div>':"")
+      +'<div class="modelbox" style="margin-top:9px;"><span class="hookline">'+esc(hook)+'</span>'+esc(rest)
+      +(t.fact?'<div style="margin-top:8px;">💡 <b>Fact inside:</b> '+esc(t.fact)+'</div>':"")
+      +'</div><p class="mut" style="margin-top:7px;">That was a model Talk. YOUR Talk will use YOUR words — that is the creator way! 🌟</p>';
+  }
+  else if(CUR.step===1){ /* CREATOR TRICK — exactly one */
+    var tr=TRICKS[t.tr];
+    body.innerHTML=head+'<div class="bubble">Today\'s ONE Creator Trick — just one! Learn this, and your Talk jumps a level! 🦜</div>'
+      +'<div class="trickbox" style="margin-top:9px;">🎬 <b>'+esc(tr.n)+'</b><br>'+esc(tr.t)+'</div>'
+      +'<p class="mut" style="margin-top:7px;">Kiki repeats it one more time: <b>'+esc(tr.n)+'!</b> Try saying it in your head… got it? Onwards!</p>';
+  }
+  else if(CUR.step===2){ /* MY 3 POINTS */
+    var saved=(S.points[CUR.id]||["","",""]);
+    body.innerHTML=head+'<div class="bubble">Now build YOUR Talk — 3 points, in YOUR words. Amma can type what you say. NO full script — points make creators! 🦜</div>'
+      +(t.mystery?'<div class="trickbox" style="margin-top:9px;">🎴 <b>Mystery Card:</b> “'+esc(t.mystery)+'” — take a happy thinking pause, then make your 3 points!</div>':"")
+      +(t.custom?'<div class="mut" style="margin-top:7px;">🎓 This is YOUR choice of topic! Point 1 starts with the topic you pick.</div>':"")
+      + t.pts.map(function(p,i){ return '<label style="font-weight:900;font-size:14px;">Point '+(i+1)+' — '+esc(p)+'</label><textarea class="ptinput" data-pt="'+i+'" placeholder="My words for point '+(i+1)+'…">'+esc(saved[i]||"")+'</textarea>'; }).join("");
+    body.querySelectorAll("[data-pt]").forEach(function(ta){ ta.addEventListener("input", function(){
+      var arr=(S.points[CUR.id]||["","",""]).slice(); arr[parseInt(ta.getAttribute("data-pt"),10)]=ta.value; S.points[CUR.id]=arr; save(); updNext(); }); });
+    updNext();
+  }
+  else if(CUR.step===3){ /* PRACTICE FACE */
+    body.innerHTML=head+'<div class="bubble">Warm-up time — NO recording, only play! Make these faces at the camera: 😊 happy… 😮 surprised… 😂 giggly… 😎 cool creator! Fear melts in play! 🦜</div>'
+      +'<div class="viewfinder" style="margin-top:9px;"><span class="vf-corner vf-tl"></span><span class="vf-corner vf-tr"></span><span class="vf-corner vf-bl"></span><span class="vf-corner vf-br"></span><div style="text-align:center;padding:20px 8px;font-family:\'Baloo 2\',cursive;font-size:20px;">📷 Practice mirror — just you and your funny faces!</div></div>'
+      +'<button class="btn big kidbtn" id="pracBtn">😄 I practised my faces!</button>';
+    next.disabled=true;
+    document.getElementById("pracBtn").addEventListener("click", function(){ CUR.practised=true; next.disabled=false; this.textContent="😄 Practised! Great warm-up, creator!"; });
+  }
+  else if(CUR.step===4){ /* SHOOT MY TALK */
+    body.innerHTML=head+'<div class="bubble">Lights… camera… YOUR Talk! Record up to <b>3 takes</b> — creators always take 2 or 3! Pick your ⭐ BEST take by tapping it. 🦜</div><div id="shootUI" style="margin-top:9px;"></div>';
+    CUR.rec=makeTalkRecorder(document.getElementById("shootUI"), { allowLive:true, maxTakes:3,
+      onChange:function(c){ CUR.performed=c.hasTake(); next.disabled=!CUR.performed; } });
+    next.disabled=!CUR.performed;
+  }
+  else if(CUR.step===5){ /* WATCH MYSELF */
+    body.innerHTML=head+'<div class="bubble">Watch YOUR best take — you did this! Before anything else: tell us <b>one thing you liked</b> about your Talk! 🦜</div>'
+      +'<video id="myVid" controls style="display:none;width:100%;border-radius:14px;background:#000;margin-top:9px;"></video>'
+      +'<div class="mut" id="myVidNote" style="margin-top:7px;"></div>'
+      +'<label style="font-weight:900;font-size:14.5px;">💛 One thing I liked about my Talk:</label>'
+      +'<textarea class="ptinput" id="likedTxt" placeholder="I liked…">'+esc(CUR.liked||"")+'</textarea>'
+      +'<p class="mut">Examples: “I smiled a lot!” · “My ending was strong!” · “I looked at the camera!”</p>';
+    var v=document.getElementById("myVid"), note=document.getElementById("myVidNote");
+    if(CUR.rec && CUR.rec.bestBlob()){ CUR.rec.playInto(v, function(){}); note.textContent=""; }
+    else { v.style.display="none"; note.textContent="You talked live to Amma for this one — lovely! Amma saw it with her own eyes. 💛"; }
+    next.disabled=!((CUR.liked||"").trim().length>0);
+    document.getElementById("likedTxt").addEventListener("input", function(e){ CUR.liked=e.target.value; next.disabled=!((CUR.liked||"").trim().length>0); });
+  }
+  else if(CUR.step===6){ /* CREATOR REVIEW */
+    var rows=DIMS.map(function(dm){ var sel=CUR.check[dm]||"";
+      return '<div class="rate" data-dim="'+esc(dm)+'"><div class="rname">'+esc(dm)+'</div>'
+        +["Growing","Good","Pro"].map(function(r){ return '<button data-r="'+r+'" class="'+(sel===r?"sel-"+r:"")+'">'+r+'</button>'; }).join("")+'</div>'; }).join("");
+    body.innerHTML=head+'<div class="bubble">Amma\'s Creator Review — 5 happy checks for this Talk. Every Talk gets stars — growing is celebrated here! 🌟</div>'
+      +'<div style="margin-top:8px;">'+rows+'</div>'
+      +'<div id="packPreview"></div>';
+    body.querySelectorAll(".rate").forEach(function(row){
+      row.querySelectorAll("button").forEach(function(b){ b.addEventListener("click", function(){
+        CUR.check[row.getAttribute("data-dim")]=b.getAttribute("data-r");
+        row.querySelectorAll("button").forEach(function(x){ x.className=""; });
+        b.className="sel-"+b.getAttribute("data-r"); updFinish(); }); });
+    });
+    updFinish(); updPackPreview();
+  }
+}
+function updNext(){ if(CUR.step!==2) return; var arr=S.points[CUR.id]||[];
+  document.getElementById("nextBtn").disabled = !(arr[0]&&arr[0].trim()&&arr[1]&&arr[1].trim()&&arr[2]&&arr[2].trim()); }
+function updFinish(){ document.getElementById("finishBtn").disabled = Object.keys(CUR.check).length<5; updPackPreview(); }
+function updPackPreview(){ var el=document.getElementById("packPreview"); if(!el) return;
+  if(CUR.stage>=2 && Object.keys(CUR.check).length===5){ el.innerHTML=packHTML(CUR.obj, CUR.id, false); }
+  else el.innerHTML = CUR.stage<2 ? '<p class="mut">Stage 1 Talks stay private in your studio — Post Packs begin at Stage 2! 💛</p>' : ""; }
+function packHTML(t, tid, withShelf){
+  var rid="rec_"+tid;
+  var st=withShelf?S.posts[rid]:null;
+  return '<div class="packbox"><h3 class="baloo" style="color:#287B3C;">📮 Post Pack — ready when you are!</h3>'
+    +'<div class="mut">Best take: saved in the video vault on this device 🎬</div>'
+    +'<div class="pline">🖥️ On-screen hook: <b>'+esc(t.hook)+'</b></div>'
+    +'<div class="pline">✏️ Caption first line: <b>'+esc(t.cap)+'</b></div>'
+    +(st?'<div class="mut">Status: <b>'+(st.status==="posted"?"Posted ✅ "+esc(st.date||""):st.status==="private"?"Kept private 💛":"Waiting to post 📮")+'</b></div>':"")
+    +'</div>';
+}
+function stepBack(){ if(CUR.step>0){ CUR.step--; renderStep(); } }
+function stepNext(){
+  if(CUR.step===4){ /* leaving shoot: stash take into CUR for watch/finish */
+    CUR.bestBlobCache = CUR.rec ? CUR.rec.bestBlob() : null;
+    CUR.liveCache = CUR.rec ? (CUR.rec.liveDone || false) : false;
+  }
+  if(CUR.step<6){ CUR.step++; renderStep(); }
+}
+
+/* ================= FINISH ================= */
+function finishTalk(){
+  if(Object.keys(CUR.check).length<5) return;
+  var already=!!(S.talks[CUR.id] && S.talks[CUR.id].done);
+  var blob = (typeof CUR.bestBlobCache!=="undefined") ? CUR.bestBlobCache : (CUR.rec?CUR.rec.bestBlob():null);
+  var live = !blob;
+  if(!already){
+    S.seq=(S.seq||0)+1;
+    S.talks[CUR.id]={ done:true, date:todayKey(), review:Object.assign({},CUR.check), liked:CUR.liked||"", live:live, seq:S.seq,
+      takes: CUR.rec?CUR.rec.takes.length:(live?0:1) };
+    S.stars+=10; S.talkCount+=1; S.studioDates[todayKey()]=true;
+    var label = CUR.kind==="trend" ? ("Trend Talk: "+CUR.obj.t) : ("Talk "+(CUR.ix+1)+": "+CUR.obj.t);
+    addRec("rec_"+CUR.id, CUR.kind, CUR.id, label, STAGES[CUR.stage-1].secs, live);
+    if(CUR.stage>=2 && !S.posts["rec_"+CUR.id]) S.posts["rec_"+CUR.id]={ status:"waiting", date:"" };
+    save();
+    if(blob) IDB.put("rec_"+CUR.id, blob, function(){});
+  } else {
+    /* re-do of a finished Talk: update the review + liked words, never the stars or the count */
+    S.talks[CUR.id].review=Object.assign({},CUR.check); S.talks[CUR.id].liked=CUR.liked||""; save();
+    if(blob) IDB.put("rec_"+CUR.id, blob, function(){});
+  }
+  celebrate(); goHome();
+}
+
+/* ================= CERTIFICATES ================= */
+function showCert(stageN){
+  var doneCount=stageDoneCount();
+  document.getElementById("certBox").innerHTML='<div style="font-size:40px;">🎓</div>'
+    +'<h2 class="baloo" style="color:var(--coral-d);font-size:24px;">Creator Certificate</h2>'
+    +'<p class="mut">This is proudly given to</p><h3 class="baloo" style="font-size:30px;">Sreshta</h3>'
+    +'<p style="font-weight:800;">for completing Stage '+stageN+" · "+STAGES[stageN-1].name+' in Sreshta Talks</p>'
+    +'<p class="baloo" style="font-size:19px;color:var(--teal);">New title: '+TITLES[stageN]+' 👑</p>'
+    +'<p class="mut">'+(doneCount>=stageN?"Stage complete — with her own words, her own style! 🌟":"")+'</p>';
+  show("scr-cert");
+}
+
+/* ================= DASHBOARD ================= */
+var DASH_TABS=[["overview","Overview"],["portfolio","Portfolio"],["confidence","Confidence Map"],["post","Post Centre"],["report","Monthly Report"],["controls","Controls"]];
+var trendFmtSel="Storytime", postCheckState={};
+function renderDash(tab){
+  document.getElementById("dashTabs").innerHTML = DASH_TABS.map(function(x){ return '<button class="'+(x[0]===tab?"on":"")+'" onclick="renderDash(\''+x[0]+'\')">'+x[1]+'</button>'; }).join("");
+  var b=document.getElementById("dashBody");
+  if(tab==="overview"){
+    var ix=nextTalkIx(), wait=Object.keys(S.posts).filter(function(k){ return S.posts[k].status==="waiting"; }).length;
+    b.innerHTML='<div class="card"><h3 class="baloo" style="color:var(--coral-d);">🌟 Where she is</h3>'
+      +'<table class="dt"><tr><td>Current stage</td><td><b>'+(ix<0?"All done! 🎓":"Stage "+stageOfTalk(ix)+" · "+STAGES[stageOfTalk(ix)-1].name)+'</b></td></tr>'
+      +'<tr><td>Creator title</td><td><b>'+curTitle()+'</b></td></tr>'
+      +'<tr><td>Talks done</td><td><b>'+S.talkCount+' of 50</b> ('+totalTalkSecs()+' seconds of talking)</td></tr>'
+      +'<tr><td>Stars</td><td><b>'+S.stars+' ⭐</b></td></tr>'
+      +'<tr><td>Baseline (Day 1)</td><td><b>'+(S.baselineDone?"Done 💎 "+esc(S.baselineDate):"Not yet — Talk 1 waits for it")+'</b></td></tr>'
+      +'<tr><td>Next Talk</td><td><b>'+(ix<0?"—":("Talk "+(ix+1)+": "+esc(TALKS[ix].t)))+'</b></td></tr>'
+      +'<tr><td>Post Packs waiting</td><td><b>'+wait+'</b> (see Post Centre)</td></tr>'
+      +'<tr><td>Premiere Nights logged</td><td><b>'+S.premieres.length+'</b></td></tr></table></div>'
+      +'<div class="card"><h3 class="baloo" style="color:var(--coral-d);">🏆 Stage certificates</h3>'
+      +[1,2,3,4,5].map(function(n){ var all=true; for(var i=0;i<10;i++) if(!talkDone((n-1)*10+i)) all=false;
+          return '<div class="row" style="margin:5px 0;"><span class="grow" style="font-weight:800;">Stage '+n+" · "+STAGES[n-1].name+(all?" ✅":"")+'</span>'+(all?'<button class="btn gold small" onclick="showCert('+n+')">🎓 Certificate</button>':"")+'</div>'; }).join("")+'</div>';
+  }
+  else if(tab==="portfolio"){
+    var rs=recs().slice().sort(function(a,c){ return a.date<c.date?-1:1; });
+    var first=rs.filter(function(r){ return r.kind==="baseline"; })[0];
+    var allTalks=rs.filter(function(r){ return r.kind!=="baseline"; });
+    var latest=allTalks[allTalks.length-1];
+    var h='<div class="card"><h3 class="baloo" style="color:var(--coral-d);">🎬 Portfolio</h3>';
+    if(first && latest){ h+='<h4 class="baloo" style="color:var(--teal);margin-top:6px;">First vs Latest</h4>'
+      +'<p class="mut">First: <b>'+esc(first.label)+'</b> ('+esc(first.date)+')</p><video id="fvFirst" controls playsinline style="width:100%;border-radius:12px;background:#000;"></video>'
+      +'<p class="mut" style="margin-top:8px;">Latest: <b>'+esc(latest.label)+'</b> ('+esc(latest.date)+')</p><video id="fvLatest" controls playsinline style="width:100%;border-radius:12px;background:#000;"></video>'; }
+    else h+='<p class="mut">Complete the Day-1 baseline and one Talk, and the First vs Latest comparison appears here. 💛</p>';
+    h+='<h4 class="baloo" style="color:var(--teal);margin-top:12px;">All recordings</h4>';
+    if(!rs.length) h+='<p class="mut">No recordings yet.</p>';
+    rs.forEach(function(r){ var starred=S.starred.indexOf(r.id)>=0;
+      h+='<div class="row" style="margin:6px 0;"><span class="grow" style="font-weight:800;">'+esc(r.label)+(r.live?" · 🎤 live to Amma":"")+'<br><span class="mut">'+esc(r.date)+'</span></span>'
+      +'<button class="btn soft small" data-play="'+r.id+'">▶️ Play</button>'
+      +'<button class="btn '+(starred?"gold":"soft")+' small" data-star="'+r.id+'">'+(starred?"🌟 In Best Talks":"☆ Best Talks")+'</button></div>'
+      +'<video id="pv_'+r.id+'" controls playsinline style="display:none;width:100%;border-radius:12px;background:#000;"></video>'; });
+    h+='</div>'; b.innerHTML=h;
+    if(first && latest){ playRecInto(document.getElementById("fvFirst"), first.id); playRecInto(document.getElementById("fvLatest"), latest.id); }
+    b.querySelectorAll("[data-play]").forEach(function(btn){ btn.addEventListener("click", function(){ playRecInto(document.getElementById("pv_"+btn.getAttribute("data-play")), btn.getAttribute("data-play")); }); });
+    b.querySelectorAll("[data-star]").forEach(function(btn){ btn.addEventListener("click", function(){ var id=btn.getAttribute("data-star");
+      var i=S.starred.indexOf(id); if(i>=0) S.starred.splice(i,1); else S.starred.push(id); save(); renderDash("portfolio"); }); });
+  }
+  else if(tab==="confidence"){
+    var h2='<div class="card"><h3 class="baloo" style="color:var(--coral-d);">💪 Confidence Map</h3><p class="mut">Average Creator Review per stage (Growing 1 · Good 2 · Pro 3). Watching this grow IS watching camera-fear melt. 💛</p><table class="dt"><tr><th>Dimension</th>';
+    for(var s2=1;s2<=5;s2++) h2+="<th>Stage "+s2+"</th>";
+    h2+="</tr>";
+    DIMS.forEach(function(dm){ h2+="<tr><td><b>"+esc(dm)+"</b></td>";
+      for(var st2=1;st2<=5;st2++){ var vals=[]; for(var i2=0;i2<10;i2++){ var td=S.talks[talkId((st2-1)*10+i2)]; if(td&&td.done&&td.review&&td.review[dm]) vals.push(rateVal(td.review[dm])); }
+        h2+="<td>"+(vals.length?(vals.reduce(function(a,c){return a+c;},0)/vals.length).toFixed(1):"—")+"</td>"; }
+      h2+="</tr>"; });
+    h2+="</table></div>"; b.innerHTML=h2;
+  }
+  else if(tab==="post"){
+    var hp='<div class="card"><h3 class="baloo" style="color:var(--coral-d);">📮 Post Centre — Ready-to-Post Shelf</h3>'
+      +'<p class="mut">Post Packs are made at the end of every Stage 2+ Talk. Posting happens on Instagram by parents only, in the 7:15 PM slot, after the safety checklist below.</p>';
+    var keys=Object.keys(S.posts);
+    if(!keys.length) hp+='<p class="mut">No Post Packs yet — the first one arrives when Talk 11 is done. 💛</p>';
+    keys.forEach(function(rid){ var tid=rid.replace("rec_",""); var ix2=TALKS.findIndex(function(t,i){ return talkId(i)===tid; });
+      var tk= ix2>=0?TALKS[ix2]:((S.trend.filter(function(x){return x.id===tid;})[0])?{t:S.trend.filter(function(x){return x.id===tid;})[0].topic,hook:"Today's Trend Talk! 🔥",cap:"Trend Talk with Sreshta"}:null);
+      if(!tk) return; var packObj={hook:tk.hook,cap:tk.cap};
+      hp+='<div style="margin:10px 0;">'+packHTML(packObj, tid, true)
+      +'<div class="row" style="margin-top:5px;"><button class="btn teal small" data-posted="'+rid+'">✅ Mark Posted</button><button class="btn soft small" data-priv="'+rid+'">💛 Keep Private</button></div></div>'; });
+    /* posted log */
+    var posted=keys.filter(function(k){ return S.posts[k].status==="posted"; });
+    hp+='<h4 class="baloo" style="color:var(--teal);margin-top:12px;">📋 Posted Log</h4>'+(posted.length?posted.map(function(k){ return '<p class="mut">'+esc(k.replace("rec_",""))+" — posted "+esc(S.posts[k].date||"")+'</p>'; }).join(""):'<p class="mut">Nothing posted from the portal yet.</p>');
+    /* safety checklist */
+    var checks=["No school name in the Talk","No home area or location in the Talk","No home routine details in the Talk","No personal contact information","Outfit and content right for her age","A parent has watched the full Talk"];
+    hp+='<h4 class="baloo" style="color:var(--teal);margin-top:12px;">🛡️ Pre-Post Safety Checklist — tick all before posting</h4>'
+      + checks.map(function(c,i){ return '<label class="checkrow"><input type="checkbox" data-safe="'+i+'"'+(postCheckState[i]?" checked":"")+'> '+c+'</label>'; }).join("")
+      +'<div class="mut" id="safeMsg">'+(checks.every(function(_,i){ return postCheckState[i]; })?"All ticked — happy posting, parents! 🎉":"Tick every box before this Talk goes to Instagram.")+'</div>';
+    /* trend talk box */
+    hp+='<h4 class="baloo" style="color:var(--teal);margin-top:14px;">🔥 Trend Talk Box</h4>'
+      +'<p class="mut">Fresh talking topics come from Instagram via Bubbly (in her Instagram project). Paste one ready line here — it becomes an extra Talk mission in her current stage style.</p>'
+      +'<input class="ptinput" id="trendTopic" placeholder="Trend topic — e.g. 3 things in my festival bag">'
+      +'<div class="row">'+["Storytime","Did You Know","Teach & Show","Try & Tell","Q&A","Festival Talk","Get Ready & Talk"].map(function(f){ return '<button class="btn '+(trendFmtSel===f?"":"soft")+' small" data-tfmt="'+f+'">'+f+'</button>'; }).join("")+'</div>'
+      +'<button class="btn big kidbtn" id="trendAdd">➕ Add as Trend Talk</button>';
+    /* premiere night */
+    hp+='<h4 class="baloo" style="color:var(--teal);margin-top:14px;">🍿 Premiere Night</h4>'
+      +'<p class="mut">Watched this week\'s best Talk together as a family? Log it — applause is the reward that matters most.</p>'
+      +'<button class="btn gold" id="premBtn">🍿 Log Premiere Night</button> <span class="mut">Logged so far: '+S.premieres.length+'</span>';
+    hp+="</div>"; b.innerHTML=hp;
+    b.querySelectorAll("[data-posted]").forEach(function(btn){ btn.addEventListener("click", function(){ S.posts[btn.getAttribute("data-posted")]={status:"posted",date:todayKey()}; save(); renderDash("post"); }); });
+    b.querySelectorAll("[data-priv]").forEach(function(btn){ btn.addEventListener("click", function(){ S.posts[btn.getAttribute("data-priv")]={status:"private",date:todayKey()}; save(); renderDash("post"); }); });
+    b.querySelectorAll("[data-safe]").forEach(function(cb2){ cb2.addEventListener("change", function(){ postCheckState[parseInt(cb2.getAttribute("data-safe"),10)]=cb2.checked;
+      document.getElementById("safeMsg").textContent = [0,1,2,3,4,5].every(function(i){ return postCheckState[i]; }) ? "All ticked — happy posting, parents! 🎉" : "Tick every box before this Talk goes to Instagram."; }); });
+    b.querySelectorAll("[data-tfmt]").forEach(function(btn){ btn.addEventListener("click", function(){ var tv=document.getElementById("trendTopic"); var keep=tv?tv.value:""; trendFmtSel=btn.getAttribute("data-tfmt"); renderDash("post"); var tv2=document.getElementById("trendTopic"); if(tv2) tv2.value=keep; }); });
+    document.getElementById("trendAdd").addEventListener("click", function(){ addTrendTalk(); });
+    document.getElementById("premBtn").addEventListener("click", function(){ S.premieres.push({date:todayKey()}); save(); renderDash("post"); });
+  }
+  else if(tab==="report"){
+    b.innerHTML=reportHTML(repMonthSel||ymKey(todayKey()));
+    var rg=document.getElementById("repGo");
+    if(rg) rg.addEventListener("click", function(){ repMonthSel=document.getElementById("repMonth").value; renderDash("report"); });
+  }
+  else if(tab==="controls"){
+    b.innerHTML='<div class="card"><h3 class="baloo" style="color:var(--coral-d);">🎛️ Controls</h3>'
+      +'<label style="font-weight:900;">🎁 Next Reward (shown as the goal she is climbing to)</label>'
+      +'<input class="ptinput" id="ctlReward" value="'+esc(S.nextReward)+'"><button class="btn" id="ctlRewardSave">Save Reward</button>'
+      +'<h4 class="baloo" style="color:var(--teal);margin-top:16px;">🏆 Creator-Kit Reward Ladder</h4>'
+      + S.rewards.map(function(r,i){ return '<label style="font-weight:800;font-size:13.5px;">Stage '+(i+1)+' reward</label><input class="ptinput" data-reward="'+i+'" value="'+esc(r)+'">'; }).join("")
+      +'<button class="btn" id="ctlLadderSave">Save Ladder</button>'
+      +'<h4 class="baloo" style="color:var(--teal);margin-top:16px;">💛 Nanna\'s Applause</h4>'
+      +'<p class="mut">Write it in your own words — Kiki delivers it exactly as written, on her studio home.</p>'
+      +'<textarea class="ptinput" id="ctlApplause" placeholder="Bravo Sreshta! Nanna loved your Talk!">'+esc(S.applause)+'</textarea>'
+      +'<button class="btn" id="ctlApplauseSave">Send Applause 💛</button>'
+      +'<h4 class="baloo" style="color:var(--coral-d);margin-top:18px;">🧹 Reset Progress</h4>'
+      +'<p class="mut">Two-tap reset. It clears Talk progress, stars, posts and Trend Talks — and it ALWAYS keeps the Day-1 baseline and her portfolio recordings, unless you tick the box below.</p>'
+      +'<label class="checkrow"><input type="checkbox" id="ctlDelBase"> Also remove baseline + portfolio recordings (full fresh start)</label>'
+      +'<button class="btn soft" id="ctlReset1">Reset… (tap 1 of 2)</button> <button class="btn" id="ctlReset2" disabled>Confirm Reset (tap 2 of 2)</button>'
+      +'</div>';
+    document.getElementById("ctlRewardSave").addEventListener("click", function(){ S.nextReward=document.getElementById("ctlReward").value; save(); });
+    document.getElementById("ctlLadderSave").addEventListener("click", function(){ b.querySelectorAll("[data-reward]").forEach(function(inp){ S.rewards[parseInt(inp.getAttribute("data-reward"),10)]=inp.value; }); save(); });
+    document.getElementById("ctlApplauseSave").addEventListener("click", function(){ S.applause=document.getElementById("ctlApplause").value; S.applauseSeen=false; save(); });
+    document.getElementById("ctlReset1").addEventListener("click", function(){ document.getElementById("ctlReset2").disabled=false; });
+    document.getElementById("ctlReset2").addEventListener("click", function(){ doReset(document.getElementById("ctlDelBase").checked); });
+  }
+}
+var repMonthSel="";
+function reportHTML(ym){
+  repMonthSel=ym;
+  var doneList=TALKS.map(function(t,ix){ return {t:t,ix:ix,d:S.talks[talkId(ix)]}; }).filter(function(x){ return x.d&&x.d.done&&ymKey(x.d.date)===ym; });
+  var fmts={}; doneList.forEach(function(x){ fmts[x.t.fmt]=(fmts[x.t.fmt]||0)+1; });
+  var prem=S.premieres.filter(function(p){ return ymKey(p.date)===ym; }).length;
+  var confLine=DIMS.map(function(dm){ var vals=[]; doneList.forEach(function(x){ if(x.d.review&&x.d.review[dm]) vals.push(rateVal(x.d.review[dm])); });
+    return "<tr><td>"+esc(dm)+"</td><td><b>"+(vals.length?(vals.reduce(function(a,c){return a+c;},0)/vals.length).toFixed(1):"—")+"</b></td></tr>"; }).join("");
+  var best=null,bestScore=-1; doneList.forEach(function(x){ var sc=0,n=0; DIMS.forEach(function(dm){ if(x.d.review&&x.d.review[dm]){ sc+=rateVal(x.d.review[dm]); n++; } });
+    if(n&&sc/n>bestScore){ bestScore=sc/n; best=x; } });
+  var nextIx=nextTalkIx();
+  return '<div class="card"><h3 class="baloo" style="color:var(--coral-d);">🗓️ Monthly Creator Report</h3>'
+    +'<label style="font-weight:900;">Month (YYYY-M)</label><input class="ptinput" id="repMonth" value="'+esc(ym)+'"><button class="btn small" id="repGo">Show Report</button>'
+    +'<table class="dt"><tr><td>Talks this month</td><td><b>'+doneList.length+'</b></td></tr>'
+    +'<tr><td>Formats used</td><td><b>'+(Object.keys(fmts).length?Object.keys(fmts).map(function(k){ return k+" × "+fmts[k]; }).join(", "):"—")+'</b></td></tr>'
+    +'<tr><td>Premiere Nights this month</td><td><b>'+prem+'</b></td></tr>'
+    +'<tr><td>Best Talk of the month</td><td><b>'+(best?("Talk "+(best.ix+1)+": "+esc(best.t.t)):"—")+'</b></td></tr>'
+    +'<tr><td>Next focus</td><td><b>'+(nextIx<0?"All 50 Talks complete! 🎓":("Talk "+(nextIx+1)+": "+esc(TALKS[nextIx].t)))+'</b></td></tr></table>'
+    +'<h4 class="baloo" style="color:var(--teal);margin-top:10px;">Confidence this month</h4><table class="dt">'+confLine+'</table>'
+    +'<p class="mut">Talks done: '+doneList.map(function(x){ return "Talk "+(x.ix+1); }).join(", ") + '</p></div>';
+}
+function addTrendTalk(){
+  var inp=document.getElementById("trendTopic"); var topic=(inp?inp.value:"").trim(); if(!topic) return false;
+  S.seq=(S.seq||0)+1; var id="trend_"+Date.now()+"_"+S.seq;
+  S.trend.push({ id:id, topic:topic, format:trendFmtSel, date:todayKey() }); save();
+  renderDash("post"); return true;
+}
+function doReset(full){
+  var keepRecs = full? [] : recs().slice();
+  var keepBase = !full;
+  var fresh=defState();
+  fresh.nextReward=S.nextReward; fresh.rewards=S.rewards;
+  if(keepBase){ fresh.baselineDone=S.baselineDone; fresh.baselineDate=S.baselineDate; fresh.baselineLive=S.baselineLive; fresh.recs=keepRecs; }
+  else { recs().forEach(function(r){ IDB.del(r.id); }); }
+  S=fresh; save(); renderDash("controls");
+}
+
+/* ================= BOOT ================= */
+load(); paintKiki();
+</script>
+</body>
+</html>
