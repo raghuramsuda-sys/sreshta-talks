@@ -409,7 +409,8 @@ function defState(){ return { baselineDone:false, baselineDate:"", baselineLive:
   talks:{}, stars:0, talkCount:0, points:{}, starred:[], studioDates:{},
   nextReward:"A creator treat she chooses — set by Amma & Nanna 🎁",
   rewards:["A small tripod 📸","Her own ring light 💡","A creator notebook 📓","A real mic 🎤","A series-launch family celebration 🎉"],
-  applause:"", applauseSeen:true, posts:{}, trend:[], premieres:[], recs:[], seq:0 }; }
+  applause:"", applauseSeen:true, posts:{}, trend:[], premieres:[], recs:[], seq:0,
+  drafts:{}, draftLast:"", baseDraft:null }; }
 var S;
 function lsGet(k){ try{ var v=localStorage.getItem(LS+k); return v?JSON.parse(v):null; }catch(e){ return null; } }
 function lsSet(k,v){ try{ localStorage.setItem(LS+k, JSON.stringify(v)); }catch(e){} }
@@ -435,6 +436,22 @@ function addRec(id,kind,tid,label,secs,live){ var rs=recs();
   for(var i=0;i<rs.length;i++){ if(rs[i].id===id){ rs[i].date=todayKey(); rs[i].live=!!live; save(); return; } }
   rs.push({id:id,kind:kind,talkId:tid||"",label:label,date:todayKey(),secs:secs||0,live:!!live}); save(); }
 function esc(s){ return String(s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;"); }
+
+/* ================= AUTO-SAVE DRAFTS (work saves as she goes) ================= */
+function takeKey(id, n){ return "take_"+id+"_"+n; }
+function delTakeKeys(id, n){ for(var i=1;i<=(n||0);i++) IDB.del(takeKey(id,i)); }
+function draftSave(){ if(!CUR) return; if(!S.drafts) S.drafts={};
+  var d={ kind:CUR.kind, ix:CUR.ix, id:CUR.id, step:CUR.step, practised:!!CUR.practised,
+    performed:!!CUR.performed, liked:CUR.liked||"", check:Object.assign({},CUR.check||{}),
+    liveDone: CUR.rec? !!CUR.rec.liveDone : !!CUR.savedLive,
+    bestIx: CUR.rec? CUR.rec.bestIx : (typeof CUR.savedBestIx==="number"?CUR.savedBestIx:-1),
+    takes: CUR.rec? CUR.rec.takes.length : (CUR.savedTakes||0) };
+  S.drafts[CUR.id]=d; S.draftLast=CUR.id; save(); }
+function clearDraft(id){ var d=(S.drafts||{})[id]; if(!d) return;
+  delTakeKeys(id, d.takes||0); delete S.drafts[id]; if(S.draftLast===id) S.draftLast=""; }
+function baseDraftSave(){ if(S.baselineDone) return; if(typeof baseRecs==="undefined"||!baseRecs.length) return;
+  S.baseDraft=baseRecs.map(function(r){ return { takes:r.takes.length, bestIx:r.bestIx, liveDone:!!r.liveDone }; }); save(); }
+function clearBaseDraft(){ var bd=S.baseDraft||[]; bd.forEach(function(x,i){ if(x) delTakeKeys(BASE_TALKS[i].id, x.takes||0); }); S.baseDraft=null; }
 
 /* ================= INDEXEDDB (video vault) ================= */
 var IDB={ db:null, opening:false,
@@ -489,7 +506,7 @@ function pinKey(k){ if(k==="clr"){ pinBuf=""; }
 
 /* ================= TALK RECORDER (up to 3 takes, she picks the best) ================= */
 function makeTalkRecorder(container, opts){
-  var ctl={ takes:[], bestIx:-1, liveDone:false, recording:false, stream:null, mr:null, chunks:[], single:!!opts.single };
+  var ctl={ takes:[], bestIx:-1, liveDone:!!opts.initialLive, recording:false, stream:null, mr:null, chunks:[], single:!!opts.single };
   function msg(t){ var m=container.querySelector('[data-role="msg"]'); if(m) m.textContent=t; }
   function hasTake(){ return ctl.takes.length>0 || ctl.liveDone; }
   function ui(){
@@ -529,7 +546,15 @@ function makeTalkRecorder(container, opts){
       ctl.mr.start(); ctl.recording=true; ui(); msg("On air! Talk like a creator! 🎬");
     }).catch(function(){ msg("Camera is off here — use the live-to-Amma tick instead! 💛"); });
   }
-  function pushTake(tk){ ctl.takes.push(tk); ctl.bestIx=ctl.takes.length-1; ui(); if(opts.onChange)opts.onChange(ctl); }
+  function pushTake(tk){ ctl.takes.push(tk); ctl.bestIx=ctl.takes.length-1; ui(); if(opts.onChange)opts.onChange(ctl);
+    /* auto-save: vault this take the moment it stops, so leaving never loses it */
+    if(tk.blob && opts.vaultPrefix && !tk.vkey){ tk.vkey=opts.vaultPrefix+ctl.takes.length; IDB.put(tk.vkey, tk.blob, function(){}); } }
+  function restoreFromVault(prefix, count, bestIx){ for(var i=0;i<count;i++){ (function(n){ var tk={ blob:null, vkey:prefix+(n+1) };
+      ctl.takes.push(tk);
+      IDB.get(tk.vkey, function(b){ if(b){ tk.blob=b; } ui(); if(opts.onChange)opts.onChange(ctl); });
+    })(i); }
+    if(count>0) ctl.bestIx=(bestIx>=0 && bestIx<count)?bestIx:(count-1);
+    ui(); if(opts.onChange)opts.onChange(ctl); }
   function stop(){
     if(window.__FAKE_REC_BLOB__ && ctl.recording){ ctl.recording=false; pushTake({blob:window.__FAKE_REC_BLOB__}); return; }
     if(ctl.mr && ctl.recording){ ctl.mr.stop(); } }
@@ -539,7 +564,7 @@ function makeTalkRecorder(container, opts){
     if(tk && tk.blob){ videoEl.src=objURL(tk.blob); videoEl.style.display="block"; if(cb)cb(true); }
     else if(cb) cb(false); }
   function bestBlob(){ var tk=ctl.takes[ctl.bestIx]; return tk?tk.blob||null:null; }
-  ctl.ui=ui; ctl.start=start; ctl.stop=stop; ctl.playBest=playBest; ctl.playInto=playInto; ctl.bestBlob=bestBlob; ctl.hasTake=hasTake;
+  ctl.ui=ui; ctl.start=start; ctl.stop=stop; ctl.playBest=playBest; ctl.playInto=playInto; ctl.bestBlob=bestBlob; ctl.hasTake=hasTake; ctl.restoreFromVault=restoreFromVault;
   ui(); return ctl;
 }
 function objURL(blob){ try{ return URL.createObjectURL(blob); }catch(e){ return ""; } }
@@ -570,12 +595,27 @@ function renderHome(){
       +'<button class="btn gold big kidbtn" onclick="openBaseline()">💎 Record My First Talks</button></div>';
   } else {
     bz.innerHTML="";
+    /* auto-save: an unfinished Talk she walked away from comes back as a Continue card */
+    var drId=S.draftLast||"", dr=drId?(S.drafts||{})[drId]:null, contShown=false;
+    if(dr && !(S.talks[drId]&&S.talks[drId].done)){
+      var dObj=null, dGo="";
+      if(dr.kind==="trend"){ var trD=S.trend.filter(function(x){ return x.id===drId; })[0];
+        if(trD){ dObj={ t:trD.topic, fmt:trD.format||"Instagram Talk" }; dGo="startTrend('"+drId+"')"; } }
+      else if(TALKS[dr.ix]){ dObj=TALKS[dr.ix]; dGo="startTalk("+dr.ix+")"; }
+      if(dObj){ contShown=true;
+        tz.innerHTML='<div class="todaytalk"><div class="row" style="padding:2px 4px 0;"><span class="recdot"><i></i>KIKI SAVED YOUR PLACE</span><span class="grow"></span><span style="font-weight:800;font-size:12.5px;">Step '+(dr.step+1)+' of 7</span></div>'
+        +'<div class="coverart"><span class="fmt">'+esc(dObj.fmt)+'</span><h3>'+esc(dObj.t)+'</h3><div class="sec">🦜 Your Talk is saved right where you left it — nothing to redo, creator!</div></div>'
+        +'<button class="btn big kidbtn" style="margin:4px;" onclick="'+dGo+'">▶️ Continue: '+esc(dObj.t)+'</button></div>';
+      }
+    }
+    if(!contShown){
     var ix=nextTalkIx();
     if(ix<0){ tz.innerHTML='<div class="todaytalk"><div class="coverart"><span class="fmt">🎓 ALL 50 TALKS DONE</span><h3>You are a Confident Creator!</h3><div class="sec">Every Talk is complete — time for a Premiere Night party! 🎉</div></div></div>'; }
     else { var t=TALKS[ix], st=STAGES[stageOfTalk(ix)-1];
       tz.innerHTML='<div class="todaytalk"><div class="row" style="padding:2px 4px 0;"><span class="recdot"><i></i>IN THE STUDIO</span><span class="grow"></span><span style="font-weight:800;font-size:12.5px;">Stage '+st.n+" · "+st.name+'</span></div>'
       +'<div class="coverart"><span class="fmt">'+esc(t.fmt)+'</span><h3>'+esc(t.t)+'</h3><div class="sec">⏱ about '+st.secs+' seconds · Talk '+(ix+1)+' of 50</div></div>'
       +'<button class="btn big kidbtn" style="margin:4px;" onclick="startTalk('+ix+')">🎬 Start Today\'s Talk</button></div>';
+    }
     }
   }
   /* stage lists */
@@ -619,12 +659,18 @@ var BASE_TALKS=[
 var baseRecs=[];
 function openBaseline(){
   var body=document.getElementById("baseBody"); body.innerHTML=""; baseRecs=[];
+  var bd=S.baseDraft||[];
   BASE_TALKS.forEach(function(b,i){
     var card=document.createElement("div"); card.className="card";
     card.innerHTML='<h3 class="baloo" style="color:var(--coral-d);">'+b.t+'</h3><p class="mut">'+b.hint+'</p><div id="baseRec'+i+'"></div>';
     body.appendChild(card);
-    baseRecs.push(makeTalkRecorder(card.querySelector("#baseRec"+i), { allowLive:true, single:false, maxTakes:1,
-      onChange:function(){ updBaseBtn(); } }));
+    var savedB=bd[i]||null;
+    var rec=makeTalkRecorder(card.querySelector("#baseRec"+i), { allowLive:true, single:false, maxTakes:1,
+      vaultPrefix:"take_"+b.id+"_", initialLive:!!(savedB&&savedB.liveDone),
+      onChange:function(){ updBaseBtn(); baseDraftSave(); } });
+    baseRecs.push(rec);
+    /* auto-save: bring back any take she recorded before walking away */
+    if(savedB && savedB.takes>0) rec.restoreFromVault("take_"+b.id+"_", savedB.takes, savedB.bestIx);
   });
   updBaseBtn(); show("scr-baseline");
 }
@@ -632,13 +678,19 @@ function updBaseBtn(){ var okAll=baseRecs.length===3 && baseRecs.every(function(
   document.getElementById("baseDoneBtn").disabled=!okAll; }
 function saveBaseline(){
   if(S.baselineDone){ goHome(); return; }
+  var bd=S.baseDraft||[];
   BASE_TALKS.forEach(function(b,i){ var r=baseRecs[i]; if(!r) return;
     var blob=r.bestBlob();
-    var live=!blob;
+    var savedB=bd[i]||null;
+    var vaultedKey=(!blob && savedB && savedB.takes>0 && savedB.bestIx>=0) ? takeKey(b.id, savedB.bestIx+1) : null;
+    var live=!blob && !vaultedKey;
     addRec(b.id,"baseline","",b.t+" — Day 1",15,live);
     if(blob) IDB.put(b.id, blob, function(){});
+    else if(vaultedKey) IDB.get(vaultedKey, function(bb){ if(bb) IDB.put(b.id, bb, function(){}); });
+    if(savedB) delTakeKeys(b.id, savedB.takes||0);
   });
-  S.baselineDone=true; S.baselineDate=todayKey(); S.baselineLive=baseRecs.every(function(r){ return !r.bestBlob(); });
+  S.baselineDone=true; S.baselineDate=todayKey(); S.baselineLive=baseRecs.every(function(r,i){ var sb=bd[i]||null; return !r.bestBlob() && !(sb && sb.takes>0); });
+  S.baseDraft=null;
   S.studioDates[todayKey()]=true; save(); celebrate(); goHome();
 }
 
@@ -647,7 +699,13 @@ var STEP_NAMES=["Watch a Talk","Creator Trick","My 3 Points","Practice Face","Sh
 var CUR=null;
 function startTalk(ix){ if(!talkUnlocked(ix)) return;
   var prev=S.talks[talkId(ix)]||{};
-  CUR={ kind:"talk", ix:ix, id:talkId(ix), obj:TALKS[ix], stage:stageOfTalk(ix), step:0, rec:null, check:prev.review||{}, liked:prev.liked||"", performed:false };
+  var dr=(S.drafts||{})[talkId(ix)]||null;
+  CUR={ kind:"talk", ix:ix, id:talkId(ix), obj:TALKS[ix], stage:stageOfTalk(ix), step:0, rec:null, check:prev.review||{}, liked:prev.liked||"", performed:false, practised:false,
+    savedTakes:0, savedBestIx:-1, savedLive:false };
+  if(dr){ /* auto-save: pick up exactly where she left this Talk */
+    CUR.step=dr.step||0; CUR.check=Object.assign({}, dr.check||{}); CUR.liked=dr.liked||"";
+    CUR.practised=!!dr.practised; CUR.performed=!!dr.performed;
+    CUR.savedTakes=dr.takes||0; CUR.savedBestIx=(typeof dr.bestIx==="number"?dr.bestIx:-1); CUR.savedLive=!!dr.liveDone; }
   showMission();
 }
 function startTrend(tid){ var tr=S.trend.filter(function(x){ return x.id===tid; })[0]; if(!tr) return;
@@ -657,7 +715,12 @@ function startTrend(tid){ var tr=S.trend.filter(function(x){ return x.id===tid; 
     pts:["Say your hook line about the topic","Say your point 2 about the topic","Say your point 3 and a happy ending"],
     hook:"Today's Trend Talk! 🔥", cap:"Trend Talk with Sreshta | Talking in the style everyone loves" };
   var prevT=S.talks[tid]||{};
-  CUR={ kind:"trend", ix:-1, id:tid, obj:obj, stage:cstage, step:0, rec:null, check:prevT.review||{}, liked:prevT.liked||"", performed:false };
+  var drT=(S.drafts||{})[tid]||null;
+  CUR={ kind:"trend", ix:-1, id:tid, obj:obj, stage:cstage, step:0, rec:null, check:prevT.review||{}, liked:prevT.liked||"", performed:false, practised:false,
+    savedTakes:0, savedBestIx:-1, savedLive:false };
+  if(drT){ CUR.step=drT.step||0; CUR.check=Object.assign({}, drT.check||{}); CUR.liked=drT.liked||"";
+    CUR.practised=!!drT.practised; CUR.performed=!!drT.performed;
+    CUR.savedTakes=drT.takes||0; CUR.savedBestIx=(typeof drT.bestIx==="number"?drT.bestIx:-1); CUR.savedLive=!!drT.liveDone; }
   showMission();
 }
 function showMission(){ paintKiki();
@@ -669,6 +732,7 @@ function showMission(){ paintKiki();
 function renderTabs(){ var h=""; for(var i=0;i<7;i++){ h+='<span class="'+(i<CUR.step?"done":(i===CUR.step?"now":""))+'"></span>'; }
   document.getElementById("stepTabs").innerHTML=h; }
 function renderStep(){
+  if(CUR) draftSave(); /* auto-save: her place in this Talk is kept on every step */
   renderTabs();
   var t=CUR.obj, body=document.getElementById("stepBody");
   document.getElementById("finishBtn").style.display = CUR.step===6 ? "" : "none";
@@ -705,13 +769,18 @@ function renderStep(){
     body.innerHTML=head+'<div class="bubble">Warm-up time — NO recording, only play! Make these faces at the camera: 😊 happy… 😮 surprised… 😂 giggly… 😎 cool creator! Fear melts in play! 🦜</div>'
       +'<div class="viewfinder" style="margin-top:9px;"><span class="vf-corner vf-tl"></span><span class="vf-corner vf-tr"></span><span class="vf-corner vf-bl"></span><span class="vf-corner vf-br"></span><div style="text-align:center;padding:20px 8px;font-family:\'Baloo 2\',cursive;font-size:20px;">📷 Practice mirror — just you and your funny faces!</div></div>'
       +'<button class="btn big kidbtn" id="pracBtn">😄 I practised my faces!</button>';
-    next.disabled=true;
-    document.getElementById("pracBtn").addEventListener("click", function(){ CUR.practised=true; next.disabled=false; this.textContent="😄 Practised! Great warm-up, creator!"; });
+    next.disabled=!CUR.practised;
+    var pracBtnEl=document.getElementById("pracBtn");
+    if(CUR.practised) pracBtnEl.textContent="😄 Practised! Great warm-up, creator!";
+    pracBtnEl.addEventListener("click", function(){ CUR.practised=true; next.disabled=false; this.textContent="😄 Practised! Great warm-up, creator!"; draftSave(); });
   }
   else if(CUR.step===4){ /* SHOOT MY TALK */
     body.innerHTML=head+'<div class="bubble">Lights… camera… YOUR Talk! Record up to <b>3 takes</b> — creators always take 2 or 3! Pick your ⭐ BEST take by tapping it. 🦜</div><div id="shootUI" style="margin-top:9px;"></div>';
+    var drNow=(S.drafts||{})[CUR.id]; if(drNow){ CUR.savedTakes=drNow.takes||0; CUR.savedBestIx=(typeof drNow.bestIx==="number"?drNow.bestIx:-1); CUR.savedLive=!!drNow.liveDone; }
     CUR.rec=makeTalkRecorder(document.getElementById("shootUI"), { allowLive:true, maxTakes:3,
-      onChange:function(c){ CUR.performed=c.hasTake(); next.disabled=!CUR.performed; } });
+      vaultPrefix:"take_"+CUR.id+"_", initialLive:!!CUR.savedLive,
+      onChange:function(c){ CUR.performed=c.hasTake(); next.disabled=!CUR.performed; draftSave(); } });
+    if(CUR.savedTakes>0) CUR.rec.restoreFromVault("take_"+CUR.id+"_", CUR.savedTakes, CUR.savedBestIx);
     next.disabled=!CUR.performed;
   }
   else if(CUR.step===5){ /* WATCH MYSELF */
@@ -723,9 +792,10 @@ function renderStep(){
       +'<p class="mut">Examples: “I smiled a lot!” · “My ending was strong!” · “I looked at the camera!”</p>';
     var v=document.getElementById("myVid"), note=document.getElementById("myVidNote");
     if(CUR.rec && CUR.rec.bestBlob()){ CUR.rec.playInto(v, function(){}); note.textContent=""; }
+    else if(CUR.savedTakes>0 && CUR.savedBestIx>=0){ playRecInto(v, takeKey(CUR.id, CUR.savedBestIx+1)); note.textContent=""; }
     else { v.style.display="none"; note.textContent="You talked live to Amma for this one — lovely! Amma saw it with her own eyes. 💛"; }
     next.disabled=!((CUR.liked||"").trim().length>0);
-    document.getElementById("likedTxt").addEventListener("input", function(e){ CUR.liked=e.target.value; next.disabled=!((CUR.liked||"").trim().length>0); });
+    document.getElementById("likedTxt").addEventListener("input", function(e){ CUR.liked=e.target.value; next.disabled=!((CUR.liked||"").trim().length>0); draftSave(); });
   }
   else if(CUR.step===6){ /* CREATOR REVIEW */
     var rows=DIMS.map(function(dm){ var sel=CUR.check[dm]||"";
@@ -738,7 +808,7 @@ function renderStep(){
       row.querySelectorAll("button").forEach(function(b){ b.addEventListener("click", function(){
         CUR.check[row.getAttribute("data-dim")]=b.getAttribute("data-r");
         row.querySelectorAll("button").forEach(function(x){ x.className=""; });
-        b.className="sel-"+b.getAttribute("data-r"); updFinish(); }); });
+        b.className="sel-"+b.getAttribute("data-r"); updFinish(); draftSave(); }); });
     });
     updFinish(); updPackPreview();
   }
@@ -773,22 +843,31 @@ function finishTalk(){
   if(Object.keys(CUR.check).length<5) return;
   var already=!!(S.talks[CUR.id] && S.talks[CUR.id].done);
   var blob = (typeof CUR.bestBlobCache!=="undefined") ? CUR.bestBlobCache : (CUR.rec?CUR.rec.bestBlob():null);
-  var live = !blob;
+  /* auto-save: her best take may already sit in the vault from the moment she recorded it */
+  var takeCount = CUR.rec? CUR.rec.takes.length : (CUR.savedTakes||0);
+  var bestIxNow = CUR.rec? CUR.rec.bestIx : CUR.savedBestIx;
+  var vaultedKey = (!blob && takeCount>0 && bestIxNow>=0) ? takeKey(CUR.id, bestIxNow+1) : null;
+  var live = !blob && !vaultedKey;
   if(!already){
     S.seq=(S.seq||0)+1;
     S.talks[CUR.id]={ done:true, date:todayKey(), review:Object.assign({},CUR.check), liked:CUR.liked||"", live:live, seq:S.seq,
-      takes: CUR.rec?CUR.rec.takes.length:(live?0:1) };
+      takes: takeCount>0?takeCount:(live?0:1) };
     S.stars+=10; S.talkCount+=1; S.studioDates[todayKey()]=true;
     var label = CUR.kind==="trend" ? ("Trend Talk: "+CUR.obj.t) : ("Talk "+(CUR.ix+1)+": "+CUR.obj.t);
     addRec("rec_"+CUR.id, CUR.kind, CUR.id, label, STAGES[CUR.stage-1].secs, live);
     if(CUR.stage>=2 && !S.posts["rec_"+CUR.id]) S.posts["rec_"+CUR.id]={ status:"waiting", date:"" };
     save();
-    if(blob) IDB.put("rec_"+CUR.id, blob, function(){});
   } else {
     /* re-do of a finished Talk: update the review + liked words, never the stars or the count */
     S.talks[CUR.id].review=Object.assign({},CUR.check); S.talks[CUR.id].liked=CUR.liked||""; save();
-    if(blob) IDB.put("rec_"+CUR.id, blob, function(){});
   }
+  /* settle the vault: the best take ends up under the Talk's own recording key, exactly once,
+     and the per-take working copies are tidied away */
+  if(blob){ IDB.put("rec_"+CUR.id, blob, function(){}); delTakeKeys(CUR.id, takeCount); }
+  else if(vaultedKey){ var vkF=vaultedKey, ridF="rec_"+CUR.id, tcF=takeCount, idF=CUR.id;
+    IDB.get(vkF, function(bb){ if(bb) IDB.put(ridF, bb, function(){}); delTakeKeys(idF, tcF); }); }
+  else if(takeCount>0){ delTakeKeys(CUR.id, takeCount); }
+  clearDraft(CUR.id); save();
   celebrate(); goHome();
 }
 
@@ -951,6 +1030,9 @@ function addTrendTalk(){
   renderDash("post"); return true;
 }
 function doReset(full){
+  /* tidy away any in-progress take-vault copies — drafts never survive a reset */
+  Object.keys(S.drafts||{}).forEach(function(id){ delTakeKeys(id, (S.drafts[id]||{}).takes||0); });
+  clearBaseDraft();
   var keepRecs = full? [] : recs().slice();
   var keepBase = !full;
   var fresh=defState();
