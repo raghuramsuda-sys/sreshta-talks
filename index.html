@@ -151,8 +151,11 @@ footer.note{text-align:center;color:var(--ink2);font-size:12px;font-weight:700;p
 .certbox{background:linear-gradient(160deg,#FFF6DE,#FFE9F1);border:3px solid var(--gold);border-radius:20px;padding:22px 16px;text-align:center;}
 .kidbtn{width:100%;margin:6px 0;}
 </style>
+<style>#islandBackBtn{position:fixed;bottom:calc(env(safe-area-inset-bottom, 0px) + 10px);left:10px;z-index:2147483000;background:#3B1163;border:1.5px solid rgba(255,201,77,.85);color:#F3DFA7;border-radius:999px;padding:9px 14px;font-weight:700;font-size:14px;line-height:1;text-decoration:none;box-shadow:0 4px 14px rgba(10,2,28,.45);min-height:44px;display:inline-flex;align-items:center;box-sizing:border-box}</style>
 </head>
 <body>
+<a id="islandBackBtn" href="https://raghuramsuda-sys.github.io/sreshta-universe/" aria-label="Back to Starlight Island dashboard">&#8592; Island</a>
+<script>(function(){var b=document.getElementById("islandBackBtn");if(!b)return;function upd(){var on=document.querySelector(".screen.on,.scr.on");var show=!on||on.id==="scr-access"||on.id==="scr-home";b.style.display=show?"inline-flex":"none";}upd();new MutationObserver(upd).observe(document.documentElement,{attributes:true,attributeFilter:["class"],subtree:true});})();</script>
 <div id="confettiBox"></div>
 
 <!-- ================= ACCESS ================= -->
